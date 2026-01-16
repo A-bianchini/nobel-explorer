@@ -1,0 +1,673 @@
+iso3,country,category,gender,year,affiliation_type,count
+ARG,Argentina,Chemistry,male,1970,research_institute,1
+ARG,Argentina,Physiology or Medicine,male,1947,research_institute,1
+AUS,Australia,Chemistry,male,2025,university,1
+AUS,Australia,Physics,male,2011,university,1
+AUS,Australia,Physiology or Medicine,male,1960,research_institute,1
+AUS,Australia,Physiology or Medicine,male,1963,university,1
+AUS,Australia,Physiology or Medicine,male,2005,research_institute,1
+AUS,Australia,Physiology or Medicine,male,2005,university,1
+AUT,Austria,Chemistry,male,1923,university,1
+AUT,Austria,Physics,male,1936,university,1
+AUT,Austria,Physics,male,2022,university,2
+AUT,Austria,Physiology or Medicine,male,1914,university,1
+AUT,Austria,Physiology or Medicine,male,1927,university,1
+AUT,Austria,Physiology or Medicine,male,1936,university,1
+AUT,Austria,Physiology or Medicine,male,1973,other,1
+BEL,Belgium,Chemistry,male,1977,university,1
+BEL,Belgium,Physics,male,2013,university,1
+BEL,Belgium,Physiology or Medicine,male,1919,university,1
+BEL,Belgium,Physiology or Medicine,male,1938,university,1
+BEL,Belgium,Physiology or Medicine,male,1974,university,2
+CAN,Canada,Chemistry,male,1971,research_institute,1
+CAN,Canada,Chemistry,male,1986,university,1
+CAN,Canada,Chemistry,male,1993,university,1
+CAN,Canada,Physics,female,2018,university,1
+CAN,Canada,Physics,male,1994,university,1
+CAN,Canada,Physics,male,2015,university,1
+CAN,Canada,Physics,male,2024,university,1
+CAN,Canada,Physiology or Medicine,male,1923,university,2
+CAN,Canada,Physiology or Medicine,male,2020,university,1
+CHE,Switzerland,Chemistry,male,1913,university,1
+CHE,Switzerland,Chemistry,male,1937,university,1
+CHE,Switzerland,Chemistry,male,1939,university,1
+CHE,Switzerland,Chemistry,male,1975,university,1
+CHE,Switzerland,Chemistry,male,1991,university,1
+CHE,Switzerland,Chemistry,male,2002,university,1
+CHE,Switzerland,Chemistry,male,2017,university,1
+CHE,Switzerland,Physics,male,1984,other,2
+CHE,Switzerland,Physics,male,1986,research_institute,2
+CHE,Switzerland,Physics,male,1987,research_institute,2
+CHE,Switzerland,Physics,male,1988,other,1
+CHE,Switzerland,Physics,male,1992,other,1
+CHE,Switzerland,Physics,male,2019,university,2
+CHE,Switzerland,Physiology or Medicine,male,1909,university,1
+CHE,Switzerland,Physiology or Medicine,male,1948,research_institute,1
+CHE,Switzerland,Physiology or Medicine,male,1949,university,1
+CHE,Switzerland,Physiology or Medicine,male,1950,university,1
+CHE,Switzerland,Physiology or Medicine,male,1978,university,1
+CHE,Switzerland,Physiology or Medicine,male,1984,research_institute,2
+CHE,Switzerland,Physiology or Medicine,male,1996,university,1
+CHN,China,Physics,male,2009,university,1
+CHN,China,Physiology or Medicine,female,2015,university,1
+CZE,Czechia,Chemistry,male,1959,university,1
+DEU,Germany,Chemistry,female,2020,other,1
+DEU,Germany,Chemistry,male,1901,university,1
+DEU,Germany,Chemistry,male,1902,university,1
+DEU,Germany,Chemistry,male,1905,university,1
+DEU,Germany,Chemistry,male,1907,university,1
+DEU,Germany,Chemistry,male,1909,university,1
+DEU,Germany,Chemistry,male,1910,university,1
+DEU,Germany,Chemistry,male,1915,other,1
+DEU,Germany,Chemistry,male,1915,university,1
+DEU,Germany,Chemistry,male,1918,other,1
+DEU,Germany,Chemistry,male,1920,university,1
+DEU,Germany,Chemistry,male,1925,university,1
+DEU,Germany,Chemistry,male,1927,university,1
+DEU,Germany,Chemistry,male,1928,university,1
+DEU,Germany,Chemistry,male,1930,university,1
+DEU,Germany,Chemistry,male,1931,other,2
+DEU,Germany,Chemistry,male,1931,university,2
+DEU,Germany,Chemistry,male,1936,other,1
+DEU,Germany,Chemistry,male,1936,university,1
+DEU,Germany,Chemistry,male,1938,other,1
+DEU,Germany,Chemistry,male,1938,university,1
+DEU,Germany,Chemistry,male,1939,other,1
+DEU,Germany,Chemistry,male,1939,university,1
+DEU,Germany,Chemistry,male,1944,other,1
+DEU,Germany,Chemistry,male,1950,university,2
+DEU,Germany,Chemistry,male,1953,research_institute,1
+DEU,Germany,Chemistry,male,1953,university,1
+DEU,Germany,Chemistry,male,1963,other,1
+DEU,Germany,Chemistry,male,1967,other,1
+DEU,Germany,Chemistry,male,1973,university,1
+DEU,Germany,Chemistry,male,1979,university,1
+DEU,Germany,Chemistry,male,1988,other,2
+DEU,Germany,Chemistry,male,1995,other,1
+DEU,Germany,Chemistry,male,2007,other,1
+DEU,Germany,Chemistry,male,2014,research_institute,2
+DEU,Germany,Chemistry,male,2021,other,1
+DEU,Germany,Economic Sciences,male,1994,university,1
+DEU,Germany,Physics,male,1901,university,1
+DEU,Germany,Physics,male,1905,university,1
+DEU,Germany,Physics,male,1911,university,1
+DEU,Germany,Physics,male,1914,university,1
+DEU,Germany,Physics,male,1918,university,1
+DEU,Germany,Physics,male,1919,university,1
+DEU,Germany,Physics,male,1921,other,1
+DEU,Germany,Physics,male,1925,university,2
+DEU,Germany,Physics,male,1932,university,1
+DEU,Germany,Physics,male,1933,university,1
+DEU,Germany,Physics,male,1954,other,1
+DEU,Germany,Physics,male,1954,university,1
+DEU,Germany,Physics,male,1961,university,1
+DEU,Germany,Physics,male,1963,university,1
+DEU,Germany,Physics,male,1985,other,1
+DEU,Germany,Physics,male,1986,other,1
+DEU,Germany,Physics,male,1989,university,1
+DEU,Germany,Physics,male,2005,research_institute,1
+DEU,Germany,Physics,male,2005,university,1
+DEU,Germany,Physics,male,2007,other,1
+DEU,Germany,Physics,male,2020,research_institute,1
+DEU,Germany,Physics,male,2021,research_institute,1
+DEU,Germany,Physics,male,2023,research_institute,1
+DEU,Germany,Physics,male,2023,university,1
+DEU,Germany,Physiology or Medicine,female,1995,other,1
+DEU,Germany,Physiology or Medicine,male,1901,university,1
+DEU,Germany,Physiology or Medicine,male,1905,research_institute,1
+DEU,Germany,Physiology or Medicine,male,1908,research_institute,1
+DEU,Germany,Physiology or Medicine,male,1908,university,1
+DEU,Germany,Physiology or Medicine,male,1910,university,1
+DEU,Germany,Physiology or Medicine,male,1922,university,1
+DEU,Germany,Physiology or Medicine,male,1931,other,1
+DEU,Germany,Physiology or Medicine,male,1935,university,1
+DEU,Germany,Physiology or Medicine,male,1939,university,1
+DEU,Germany,Physiology or Medicine,male,1956,university,1
+DEU,Germany,Physiology or Medicine,male,1964,other,1
+DEU,Germany,Physiology or Medicine,male,1973,other,1
+DEU,Germany,Physiology or Medicine,male,1973,university,1
+DEU,Germany,Physiology or Medicine,male,1991,other,2
+DEU,Germany,Physiology or Medicine,male,2008,research_institute,1
+DEU,Germany,Physiology or Medicine,male,2022,research_institute,1
+DEU,Germany,Physiology or Medicine,male,2022,university,1
+DNK,Denmark,Chemistry,male,1997,university,1
+DNK,Denmark,Chemistry,male,2022,university,1
+DNK,Denmark,Economic Sciences,male,2010,university,1
+DNK,Denmark,Physics,male,1922,university,1
+DNK,Denmark,Physics,male,1975,other,1
+DNK,Denmark,Physics,male,1975,research_institute,1
+DNK,Denmark,Physiology or Medicine,male,1903,research_institute,1
+DNK,Denmark,Physiology or Medicine,male,1920,university,1
+DNK,Denmark,Physiology or Medicine,male,1926,university,1
+DNK,Denmark,Physiology or Medicine,male,1943,university,1
+ESP,Spain,Physiology or Medicine,male,1906,university,1
+FIN,Finland,Chemistry,male,1945,university,1
+FRA,France,Chemistry,female,1911,university,1
+FRA,France,Chemistry,female,1935,other,1
+FRA,France,Chemistry,male,1906,university,1
+FRA,France,Chemistry,male,1912,university,2
+FRA,France,Chemistry,male,1935,other,1
+FRA,France,Chemistry,male,1987,other,1
+FRA,France,Chemistry,male,1987,university,1
+FRA,France,Chemistry,male,2005,other,1
+FRA,France,Chemistry,male,2013,university,1
+FRA,France,Chemistry,male,2016,university,1
+FRA,France,Economic Sciences,male,1988,other,1
+FRA,France,Economic Sciences,male,2014,university,1
+FRA,France,Economic Sciences,male,2025,other,2
+FRA,France,Peace,male,1907,university,1
+FRA,France,Physics,male,1903,other,1
+FRA,France,Physics,male,1903,university,1
+FRA,France,Physics,male,1908,university,1
+FRA,France,Physics,male,1909,university,1
+FRA,France,Physics,male,1920,other,1
+FRA,France,Physics,male,1926,university,1
+FRA,France,Physics,male,1929,university,1
+FRA,France,Physics,male,1966,other,1
+FRA,France,Physics,male,1970,university,1
+FRA,France,Physics,male,1991,other,1
+FRA,France,Physics,male,1992,other,1
+FRA,France,Physics,male,1997,other,2
+FRA,France,Physics,male,2007,other,1
+FRA,France,Physics,male,2007,university,1
+FRA,France,Physics,male,2012,other,2
+FRA,France,Physics,male,2018,other,1
+FRA,France,Physics,male,2022,other,1
+FRA,France,Physics,male,2022,university,1
+FRA,France,Physiology or Medicine,female,2008,government,1
+FRA,France,Physiology or Medicine,male,1907,other,1
+FRA,France,Physiology or Medicine,male,1908,other,1
+FRA,France,Physiology or Medicine,male,1913,university,1
+FRA,France,Physiology or Medicine,male,1965,other,3
+FRA,France,Physiology or Medicine,male,1980,university,1
+FRA,France,Physiology or Medicine,male,2008,research_institute,1
+FRA,France,Physiology or Medicine,male,2011,university,1
+GBR,United Kingdom,Chemistry,female,1964,university,1
+GBR,United Kingdom,Chemistry,male,1904,university,1
+GBR,United Kingdom,Chemistry,male,1908,university,1
+GBR,United Kingdom,Chemistry,male,1921,university,1
+GBR,United Kingdom,Chemistry,male,1922,university,1
+GBR,United Kingdom,Chemistry,male,1929,university,1
+GBR,United Kingdom,Chemistry,male,1937,university,1
+GBR,United Kingdom,Chemistry,male,1947,university,1
+GBR,United Kingdom,Chemistry,male,1952,research_institute,2
+GBR,United Kingdom,Chemistry,male,1956,university,1
+GBR,United Kingdom,Chemistry,male,1957,university,1
+GBR,United Kingdom,Chemistry,male,1958,university,1
+GBR,United Kingdom,Chemistry,male,1962,research_institute,2
+GBR,United Kingdom,Chemistry,male,1967,government,1
+GBR,United Kingdom,Chemistry,male,1967,research_institute,1
+GBR,United Kingdom,Chemistry,male,1969,university,1
+GBR,United Kingdom,Chemistry,male,1973,university,1
+GBR,United Kingdom,Chemistry,male,1975,university,1
+GBR,United Kingdom,Chemistry,male,1978,research_institute,1
+GBR,United Kingdom,Chemistry,male,1980,research_institute,1
+GBR,United Kingdom,Chemistry,male,1982,research_institute,1
+GBR,United Kingdom,Chemistry,male,1996,university,1
+GBR,United Kingdom,Chemistry,male,1997,research_institute,1
+GBR,United Kingdom,Chemistry,male,2009,research_institute,1
+GBR,United Kingdom,Chemistry,male,2015,research_institute,2
+GBR,United Kingdom,Chemistry,male,2017,research_institute,1
+GBR,United Kingdom,Chemistry,male,2018,research_institute,1
+GBR,United Kingdom,Chemistry,male,2024,other,2
+GBR,United Kingdom,Economic Sciences,male,1972,university,1
+GBR,United Kingdom,Economic Sciences,male,1977,university,1
+GBR,United Kingdom,Economic Sciences,male,1984,university,1
+GBR,United Kingdom,Economic Sciences,male,1996,university,1
+GBR,United Kingdom,Economic Sciences,male,1998,university,1
+GBR,United Kingdom,Economic Sciences,male,2010,university,1
+GBR,United Kingdom,Economic Sciences,male,2025,university,1
+GBR,United Kingdom,Physics,male,1904,government,1
+GBR,United Kingdom,Physics,male,1906,university,1
+GBR,United Kingdom,Physics,male,1909,company,1
+GBR,United Kingdom,Physics,male,1915,university,2
+GBR,United Kingdom,Physics,male,1917,university,1
+GBR,United Kingdom,Physics,male,1927,university,1
+GBR,United Kingdom,Physics,male,1928,university,1
+GBR,United Kingdom,Physics,male,1933,university,1
+GBR,United Kingdom,Physics,male,1935,university,1
+GBR,United Kingdom,Physics,male,1937,university,1
+GBR,United Kingdom,Physics,male,1947,research_institute,1
+GBR,United Kingdom,Physics,male,1948,university,1
+GBR,United Kingdom,Physics,male,1950,university,1
+GBR,United Kingdom,Physics,male,1951,research_institute,1
+GBR,United Kingdom,Physics,male,1954,university,1
+GBR,United Kingdom,Physics,male,1971,university,1
+GBR,United Kingdom,Physics,male,1973,university,1
+GBR,United Kingdom,Physics,male,1974,university,2
+GBR,United Kingdom,Physics,male,1977,university,1
+GBR,United Kingdom,Physics,male,1979,university,1
+GBR,United Kingdom,Physics,male,2009,research_institute,1
+GBR,United Kingdom,Physics,male,2010,university,2
+GBR,United Kingdom,Physics,male,2013,university,1
+GBR,United Kingdom,Physics,male,2019,university,1
+GBR,United Kingdom,Physics,male,2020,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1902,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1922,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1929,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1932,university,2
+GBR,United Kingdom,Physiology or Medicine,male,1936,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,1945,university,3
+GBR,United Kingdom,Physiology or Medicine,male,1953,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1960,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1962,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,1962,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1963,university,2
+GBR,United Kingdom,Physiology or Medicine,male,1970,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1972,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1973,university,1
+GBR,United Kingdom,Physiology or Medicine,male,1975,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,1979,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,1982,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,1984,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,1988,university,1
+GBR,United Kingdom,Physiology or Medicine,male,2001,research_institute,2
+GBR,United Kingdom,Physiology or Medicine,male,2002,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,2003,university,1
+GBR,United Kingdom,Physiology or Medicine,male,2007,university,1
+GBR,United Kingdom,Physiology or Medicine,male,2010,university,1
+GBR,United Kingdom,Physiology or Medicine,male,2012,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,2014,university,1
+GBR,United Kingdom,Physiology or Medicine,male,2019,research_institute,1
+GBR,United Kingdom,Physiology or Medicine,male,2019,university,1
+HUN,Hungary,Physiology or Medicine,female,2023,university,1
+HUN,Hungary,Physiology or Medicine,male,1937,university,1
+IND,India,Physics,male,1930,university,1
+IRL,Ireland,Physics,male,1951,university,1
+ISR,Israel,Chemistry,female,2009,research_institute,1
+ISR,Israel,Chemistry,male,2004,university,2
+ISR,Israel,Chemistry,male,2011,university,1
+ISR,Israel,Economic Sciences,male,2005,university,1
+ISR,Israel,Economic Sciences,male,2025,university,1
+ITA,Italy,Chemistry,male,1963,university,1
+ITA,Italy,Physics,male,1938,university,1
+ITA,Italy,Physics,male,1979,research_institute,1
+ITA,Italy,Physics,male,2021,university,1
+ITA,Italy,Physiology or Medicine,female,1986,research_institute,1
+ITA,Italy,Physiology or Medicine,male,1906,university,1
+ITA,Italy,Physiology or Medicine,male,1957,research_institute,1
+JPN,Japan,Chemistry,male,1981,university,1
+JPN,Japan,Chemistry,male,2000,university,1
+JPN,Japan,Chemistry,male,2001,university,1
+JPN,Japan,Chemistry,male,2002,company,1
+JPN,Japan,Chemistry,male,2010,university,1
+JPN,Japan,Chemistry,male,2019,other,1
+JPN,Japan,Chemistry,male,2019,university,1
+JPN,Japan,Chemistry,male,2025,university,1
+JPN,Japan,Physics,male,1949,university,1
+JPN,Japan,Physics,male,1965,university,1
+JPN,Japan,Physics,male,2002,university,1
+JPN,Japan,Physics,male,2008,research_institute,1
+JPN,Japan,Physics,male,2008,university,2
+JPN,Japan,Physics,male,2014,university,3
+JPN,Japan,Physics,male,2015,university,1
+JPN,Japan,Physiology or Medicine,male,2012,university,1
+JPN,Japan,Physiology or Medicine,male,2015,university,1
+JPN,Japan,Physiology or Medicine,male,2016,university,1
+JPN,Japan,Physiology or Medicine,male,2018,university,1
+JPN,Japan,Physiology or Medicine,male,2022,research_institute,1
+JPN,Japan,Physiology or Medicine,male,2025,university,1
+NLD,Netherlands,Chemistry,male,2016,university,1
+NLD,Netherlands,Economic Sciences,male,1969,university,1
+NLD,Netherlands,Physics,male,1902,university,2
+NLD,Netherlands,Physics,male,1910,university,1
+NLD,Netherlands,Physics,male,1913,university,1
+NLD,Netherlands,Physics,male,1953,university,1
+NLD,Netherlands,Physics,male,1999,university,1
+NLD,Netherlands,Physiology or Medicine,male,1924,university,1
+NLD,Netherlands,Physiology or Medicine,male,1929,university,1
+NOR,Norway,Chemistry,male,1969,university,1
+NOR,Norway,Economic Sciences,male,1969,university,1
+NOR,Norway,Economic Sciences,male,1989,university,1
+NOR,Norway,Physiology or Medicine,female,2014,university,1
+NOR,Norway,Physiology or Medicine,male,2014,university,1
+PRT,Portugal,Physiology or Medicine,male,1949,research_institute,1
+PRT,Portugal,Physiology or Medicine,male,1949,university,1
+RUS,Russia,Chemistry,male,1956,university,2
+RUS,Russia,Economic Sciences,male,1975,university,1
+RUS,Russia,Physics,male,1958,research_institute,3
+RUS,Russia,Physics,male,1958,university,2
+RUS,Russia,Physics,male,1962,university,1
+RUS,Russia,Physics,male,1964,research_institute,2
+RUS,Russia,Physics,male,1978,university,1
+RUS,Russia,Physics,male,2000,research_institute,1
+RUS,Russia,Physics,male,2003,research_institute,1
+RUS,Russia,Physiology or Medicine,male,1904,university,1
+SWE,Sweden,Chemistry,male,1903,university,1
+SWE,Sweden,Chemistry,male,1926,university,1
+SWE,Sweden,Chemistry,male,1929,university,1
+SWE,Sweden,Chemistry,male,1943,university,1
+SWE,Sweden,Chemistry,male,1948,university,1
+SWE,Sweden,Economic Sciences,male,1977,university,1
+SWE,Sweden,Physics,female,2023,university,1
+SWE,Sweden,Physics,male,1912,other,1
+SWE,Sweden,Physics,male,1924,university,1
+SWE,Sweden,Physics,male,1970,university,1
+SWE,Sweden,Physics,male,1981,university,1
+SWE,Sweden,Physiology or Medicine,male,1911,university,1
+SWE,Sweden,Physiology or Medicine,male,1955,research_institute,1
+SWE,Sweden,Physiology or Medicine,male,1967,other,1
+SWE,Sweden,Physiology or Medicine,male,1970,other,1
+SWE,Sweden,Physiology or Medicine,male,1982,other,2
+SWE,Sweden,Physiology or Medicine,male,2000,university,1
+TUN,Tunisia,Physiology or Medicine,male,1928,other,1
+USA,United States,Chemistry,female,2018,university,1
+USA,United States,Chemistry,female,2020,university,1
+USA,United States,Chemistry,female,2022,research_institute,1
+USA,United States,Chemistry,female,2022,university,1
+USA,United States,Chemistry,male,1914,university,1
+USA,United States,Chemistry,male,1932,company,1
+USA,United States,Chemistry,male,1934,university,1
+USA,United States,Chemistry,male,1946,research_institute,2
+USA,United States,Chemistry,male,1946,university,1
+USA,United States,Chemistry,male,1949,university,1
+USA,United States,Chemistry,male,1951,university,2
+USA,United States,Chemistry,male,1954,university,1
+USA,United States,Chemistry,male,1955,university,1
+USA,United States,Chemistry,male,1960,university,1
+USA,United States,Chemistry,male,1961,university,1
+USA,United States,Chemistry,male,1965,university,1
+USA,United States,Chemistry,male,1966,university,1
+USA,United States,Chemistry,male,1968,university,1
+USA,United States,Chemistry,male,1972,government,1
+USA,United States,Chemistry,male,1972,university,2
+USA,United States,Chemistry,male,1974,university,1
+USA,United States,Chemistry,male,1976,university,1
+USA,United States,Chemistry,male,1977,university,1
+USA,United States,Chemistry,male,1979,university,1
+USA,United States,Chemistry,male,1980,university,2
+USA,United States,Chemistry,male,1981,university,1
+USA,United States,Chemistry,male,1983,university,1
+USA,United States,Chemistry,male,1984,university,1
+USA,United States,Chemistry,male,1985,research_institute,2
+USA,United States,Chemistry,male,1986,university,2
+USA,United States,Chemistry,male,1987,other,1
+USA,United States,Chemistry,male,1987,university,1
+USA,United States,Chemistry,male,1988,research_institute,1
+USA,United States,Chemistry,male,1988,university,1
+USA,United States,Chemistry,male,1989,university,2
+USA,United States,Chemistry,male,1990,university,1
+USA,United States,Chemistry,male,1992,university,1
+USA,United States,Chemistry,male,1994,university,1
+USA,United States,Chemistry,male,1995,university,2
+USA,United States,Chemistry,male,1996,university,2
+USA,United States,Chemistry,male,1997,university,1
+USA,United States,Chemistry,male,1998,university,2
+USA,United States,Chemistry,male,1999,university,1
+USA,United States,Chemistry,male,2000,university,2
+USA,United States,Chemistry,male,2001,research_institute,1
+USA,United States,Chemistry,male,2002,research_institute,1
+USA,United States,Chemistry,male,2002,university,1
+USA,United States,Chemistry,male,2003,research_institute,1
+USA,United States,Chemistry,male,2003,university,2
+USA,United States,Chemistry,male,2004,university,1
+USA,United States,Chemistry,male,2005,university,2
+USA,United States,Chemistry,male,2006,university,1
+USA,United States,Chemistry,male,2008,research_institute,2
+USA,United States,Chemistry,male,2008,university,3
+USA,United States,Chemistry,male,2009,research_institute,1
+USA,United States,Chemistry,male,2009,university,1
+USA,United States,Chemistry,male,2010,university,2
+USA,United States,Chemistry,male,2012,research_institute,1
+USA,United States,Chemistry,male,2012,university,2
+USA,United States,Chemistry,male,2013,university,3
+USA,United States,Chemistry,male,2014,research_institute,1
+USA,United States,Chemistry,male,2014,university,1
+USA,United States,Chemistry,male,2015,research_institute,1
+USA,United States,Chemistry,male,2015,university,2
+USA,United States,Chemistry,male,2016,university,1
+USA,United States,Chemistry,male,2017,university,1
+USA,United States,Chemistry,male,2018,university,1
+USA,United States,Chemistry,male,2019,university,2
+USA,United States,Chemistry,male,2021,university,1
+USA,United States,Chemistry,male,2022,research_institute,1
+USA,United States,Chemistry,male,2023,company,1
+USA,United States,Chemistry,male,2023,university,2
+USA,United States,Chemistry,male,2024,research_institute,1
+USA,United States,Chemistry,male,2024,university,1
+USA,United States,Chemistry,male,2025,university,1
+USA,United States,Economic Sciences,female,2009,university,2
+USA,United States,Economic Sciences,female,2019,university,1
+USA,United States,Economic Sciences,female,2023,university,1
+USA,United States,Economic Sciences,male,1970,university,1
+USA,United States,Economic Sciences,male,1971,university,1
+USA,United States,Economic Sciences,male,1972,university,1
+USA,United States,Economic Sciences,male,1973,university,1
+USA,United States,Economic Sciences,male,1975,university,1
+USA,United States,Economic Sciences,male,1976,university,1
+USA,United States,Economic Sciences,male,1978,university,1
+USA,United States,Economic Sciences,male,1979,university,2
+USA,United States,Economic Sciences,male,1980,university,1
+USA,United States,Economic Sciences,male,1981,university,1
+USA,United States,Economic Sciences,male,1982,university,1
+USA,United States,Economic Sciences,male,1983,university,1
+USA,United States,Economic Sciences,male,1985,university,1
+USA,United States,Economic Sciences,male,1986,research_institute,1
+USA,United States,Economic Sciences,male,1987,university,1
+USA,United States,Economic Sciences,male,1990,university,3
+USA,United States,Economic Sciences,male,1991,university,1
+USA,United States,Economic Sciences,male,1992,university,1
+USA,United States,Economic Sciences,male,1993,university,2
+USA,United States,Economic Sciences,male,1994,university,2
+USA,United States,Economic Sciences,male,1995,university,1
+USA,United States,Economic Sciences,male,1996,university,1
+USA,United States,Economic Sciences,male,1997,other,1
+USA,United States,Economic Sciences,male,1997,university,1
+USA,United States,Economic Sciences,male,1999,university,1
+USA,United States,Economic Sciences,male,2000,university,2
+USA,United States,Economic Sciences,male,2001,university,3
+USA,United States,Economic Sciences,male,2002,university,2
+USA,United States,Economic Sciences,male,2003,university,2
+USA,United States,Economic Sciences,male,2004,other,1
+USA,United States,Economic Sciences,male,2004,university,3
+USA,United States,Economic Sciences,male,2005,university,1
+USA,United States,Economic Sciences,male,2006,university,1
+USA,United States,Economic Sciences,male,2007,research_institute,1
+USA,United States,Economic Sciences,male,2007,university,2
+USA,United States,Economic Sciences,male,2008,university,1
+USA,United States,Economic Sciences,male,2009,university,1
+USA,United States,Economic Sciences,male,2010,university,2
+USA,United States,Economic Sciences,male,2011,university,2
+USA,United States,Economic Sciences,male,2012,other,1
+USA,United States,Economic Sciences,male,2012,university,2
+USA,United States,Economic Sciences,male,2013,university,3
+USA,United States,Economic Sciences,male,2015,university,1
+USA,United States,Economic Sciences,male,2016,university,2
+USA,United States,Economic Sciences,male,2017,university,1
+USA,United States,Economic Sciences,male,2018,university,2
+USA,United States,Economic Sciences,male,2019,university,2
+USA,United States,Economic Sciences,male,2020,university,2
+USA,United States,Economic Sciences,male,2021,university,3
+USA,United States,Economic Sciences,male,2022,other,1
+USA,United States,Economic Sciences,male,2022,university,2
+USA,United States,Economic Sciences,male,2024,university,3
+USA,United States,Economic Sciences,male,2025,university,2
+USA,United States,Peace,male,1931,university,1
+USA,United States,Peace,male,1950,university,1
+USA,United States,Peace,male,1962,university,1
+USA,United States,Physics,female,1963,university,1
+USA,United States,Physics,female,2020,university,1
+USA,United States,Physics,male,1907,university,1
+USA,United States,Physics,male,1923,university,1
+USA,United States,Physics,male,1927,university,1
+USA,United States,Physics,male,1936,university,1
+USA,United States,Physics,male,1937,research_institute,1
+USA,United States,Physics,male,1939,university,1
+USA,United States,Physics,male,1943,university,1
+USA,United States,Physics,male,1944,university,1
+USA,United States,Physics,male,1945,university,1
+USA,United States,Physics,male,1946,university,1
+USA,United States,Physics,male,1949,university,1
+USA,United States,Physics,male,1952,university,2
+USA,United States,Physics,male,1955,university,2
+USA,United States,Physics,male,1956,research_institute,2
+USA,United States,Physics,male,1956,university,1
+USA,United States,Physics,male,1957,research_institute,1
+USA,United States,Physics,male,1957,university,1
+USA,United States,Physics,male,1959,university,2
+USA,United States,Physics,male,1960,university,1
+USA,United States,Physics,male,1961,university,2
+USA,United States,Physics,male,1963,university,1
+USA,United States,Physics,male,1964,university,1
+USA,United States,Physics,male,1965,university,2
+USA,United States,Physics,male,1967,university,1
+USA,United States,Physics,male,1968,university,1
+USA,United States,Physics,male,1969,university,1
+USA,United States,Physics,male,1972,university,3
+USA,United States,Physics,male,1973,company,1
+USA,United States,Physics,male,1973,research_institute,1
+USA,United States,Physics,male,1975,university,1
+USA,United States,Physics,male,1976,research_institute,1
+USA,United States,Physics,male,1976,university,1
+USA,United States,Physics,male,1977,research_institute,1
+USA,United States,Physics,male,1977,university,1
+USA,United States,Physics,male,1978,research_institute,2
+USA,United States,Physics,male,1979,university,2
+USA,United States,Physics,male,1980,university,2
+USA,United States,Physics,male,1981,university,2
+USA,United States,Physics,male,1982,university,1
+USA,United States,Physics,male,1983,university,2
+USA,United States,Physics,male,1988,company,1
+USA,United States,Physics,male,1988,research_institute,1
+USA,United States,Physics,male,1989,university,2
+USA,United States,Physics,male,1990,university,3
+USA,United States,Physics,male,1993,university,2
+USA,United States,Physics,male,1994,university,1
+USA,United States,Physics,male,1995,university,2
+USA,United States,Physics,male,1996,university,3
+USA,United States,Physics,male,1997,research_institute,1
+USA,United States,Physics,male,1997,university,1
+USA,United States,Physics,male,1998,university,3
+USA,United States,Physics,male,2000,other,1
+USA,United States,Physics,male,2000,university,1
+USA,United States,Physics,male,2001,university,3
+USA,United States,Physics,male,2002,university,2
+USA,United States,Physics,male,2003,research_institute,1
+USA,United States,Physics,male,2003,university,1
+USA,United States,Physics,male,2004,university,3
+USA,United States,Physics,male,2005,research_institute,1
+USA,United States,Physics,male,2005,university,2
+USA,United States,Physics,male,2006,research_institute,1
+USA,United States,Physics,male,2006,university,1
+USA,United States,Physics,male,2008,university,1
+USA,United States,Physics,male,2009,research_institute,2
+USA,United States,Physics,male,2011,research_institute,2
+USA,United States,Physics,male,2011,university,2
+USA,United States,Physics,male,2012,research_institute,1
+USA,United States,Physics,male,2012,university,1
+USA,United States,Physics,male,2014,university,1
+USA,United States,Physics,male,2016,university,3
+USA,United States,Physics,male,2017,university,3
+USA,United States,Physics,male,2018,research_institute,1
+USA,United States,Physics,male,2018,university,1
+USA,United States,Physics,male,2019,university,1
+USA,United States,Physics,male,2020,university,1
+USA,United States,Physics,male,2021,university,1
+USA,United States,Physics,male,2022,other,1
+USA,United States,Physics,male,2023,university,1
+USA,United States,Physics,male,2024,university,1
+USA,United States,Physics,male,2025,other,1
+USA,United States,Physics,male,2025,university,4
+USA,United States,Physiology or Medicine,female,1947,university,1
+USA,United States,Physiology or Medicine,female,1977,research_institute,1
+USA,United States,Physiology or Medicine,female,1983,research_institute,1
+USA,United States,Physiology or Medicine,female,1988,research_institute,1
+USA,United States,Physiology or Medicine,female,2004,research_institute,1
+USA,United States,Physiology or Medicine,female,2009,university,2
+USA,United States,Physiology or Medicine,female,2023,university,1
+USA,United States,Physiology or Medicine,female,2025,research_institute,1
+USA,United States,Physiology or Medicine,male,1912,research_institute,1
+USA,United States,Physiology or Medicine,male,1930,research_institute,1
+USA,United States,Physiology or Medicine,male,1933,university,1
+USA,United States,Physiology or Medicine,male,1934,research_institute,1
+USA,United States,Physiology or Medicine,male,1934,university,3
+USA,United States,Physiology or Medicine,male,1943,university,1
+USA,United States,Physiology or Medicine,male,1944,research_institute,1
+USA,United States,Physiology or Medicine,male,1944,university,1
+USA,United States,Physiology or Medicine,male,1946,university,1
+USA,United States,Physiology or Medicine,male,1947,university,1
+USA,United States,Physiology or Medicine,male,1950,research_institute,2
+USA,United States,Physiology or Medicine,male,1951,research_institute,1
+USA,United States,Physiology or Medicine,male,1952,university,1
+USA,United States,Physiology or Medicine,male,1953,other,1
+USA,United States,Physiology or Medicine,male,1953,research_institute,1
+USA,United States,Physiology or Medicine,male,1954,other,1
+USA,United States,Physiology or Medicine,male,1954,research_institute,2
+USA,United States,Physiology or Medicine,male,1954,university,1
+USA,United States,Physiology or Medicine,male,1956,university,2
+USA,United States,Physiology or Medicine,male,1958,research_institute,1
+USA,United States,Physiology or Medicine,male,1958,university,2
+USA,United States,Physiology or Medicine,male,1959,university,2
+USA,United States,Physiology or Medicine,male,1961,university,1
+USA,United States,Physiology or Medicine,male,1962,university,1
+USA,United States,Physiology or Medicine,male,1964,university,1
+USA,United States,Physiology or Medicine,male,1966,university,2
+USA,United States,Physiology or Medicine,male,1967,university,2
+USA,United States,Physiology or Medicine,male,1968,government,1
+USA,United States,Physiology or Medicine,male,1968,university,2
+USA,United States,Physiology or Medicine,male,1969,other,1
+USA,United States,Physiology or Medicine,male,1969,university,2
+USA,United States,Physiology or Medicine,male,1970,government,1
+USA,United States,Physiology or Medicine,male,1971,university,1
+USA,United States,Physiology or Medicine,male,1972,university,1
+USA,United States,Physiology or Medicine,male,1974,university,2
+USA,United States,Physiology or Medicine,male,1975,university,2
+USA,United States,Physiology or Medicine,male,1976,government,1
+USA,United States,Physiology or Medicine,male,1976,research_institute,1
+USA,United States,Physiology or Medicine,male,1977,research_institute,2
+USA,United States,Physiology or Medicine,male,1978,university,2
+USA,United States,Physiology or Medicine,male,1979,university,1
+USA,United States,Physiology or Medicine,male,1980,other,1
+USA,United States,Physiology or Medicine,male,1980,research_institute,1
+USA,United States,Physiology or Medicine,male,1981,other,2
+USA,United States,Physiology or Medicine,male,1981,university,1
+USA,United States,Physiology or Medicine,male,1985,university,2
+USA,United States,Physiology or Medicine,male,1986,university,1
+USA,United States,Physiology or Medicine,male,1987,university,1
+USA,United States,Physiology or Medicine,male,1988,research_institute,1
+USA,United States,Physiology or Medicine,male,1989,university,2
+USA,United States,Physiology or Medicine,male,1990,research_institute,2
+USA,United States,Physiology or Medicine,male,1992,university,2
+USA,United States,Physiology or Medicine,male,1993,other,1
+USA,United States,Physiology or Medicine,male,1993,university,1
+USA,United States,Physiology or Medicine,male,1994,research_institute,1
+USA,United States,Physiology or Medicine,male,1994,university,1
+USA,United States,Physiology or Medicine,male,1995,university,2
+USA,United States,Physiology or Medicine,male,1996,research_institute,1
+USA,United States,Physiology or Medicine,male,1997,university,1
+USA,United States,Physiology or Medicine,male,1998,research_institute,1
+USA,United States,Physiology or Medicine,male,1998,university,2
+USA,United States,Physiology or Medicine,male,1999,research_institute,1
+USA,United States,Physiology or Medicine,male,1999,university,1
+USA,United States,Physiology or Medicine,male,2000,university,2
+USA,United States,Physiology or Medicine,male,2001,research_institute,1
+USA,United States,Physiology or Medicine,male,2002,research_institute,1
+USA,United States,Physiology or Medicine,male,2002,university,1
+USA,United States,Physiology or Medicine,male,2003,university,1
+USA,United States,Physiology or Medicine,male,2004,university,1
+USA,United States,Physiology or Medicine,male,2006,university,2
+USA,United States,Physiology or Medicine,male,2007,research_institute,1
+USA,United States,Physiology or Medicine,male,2007,university,2
+USA,United States,Physiology or Medicine,male,2009,other,1
+USA,United States,Physiology or Medicine,male,2009,research_institute,2
+USA,United States,Physiology or Medicine,male,2011,research_institute,1
+USA,United States,Physiology or Medicine,male,2011,university,2
+USA,United States,Physiology or Medicine,male,2012,other,1
+USA,United States,Physiology or Medicine,male,2013,research_institute,2
+USA,United States,Physiology or Medicine,male,2013,university,3
+USA,United States,Physiology or Medicine,male,2015,university,1
+USA,United States,Physiology or Medicine,male,2017,research_institute,1
+USA,United States,Physiology or Medicine,male,2017,university,3
+USA,United States,Physiology or Medicine,male,2018,research_institute,1
+USA,United States,Physiology or Medicine,male,2018,university,1
+USA,United States,Physiology or Medicine,male,2019,other,1
+USA,United States,Physiology or Medicine,male,2019,research_institute,3
+USA,United States,Physiology or Medicine,male,2019,university,1
+USA,United States,Physiology or Medicine,male,2020,government,1
+USA,United States,Physiology or Medicine,male,2020,university,1
+USA,United States,Physiology or Medicine,male,2021,research_institute,2
+USA,United States,Physiology or Medicine,male,2021,university,1
+USA,United States,Physiology or Medicine,male,2023,university,1
+USA,United States,Physiology or Medicine,male,2024,other,2
+USA,United States,Physiology or Medicine,male,2024,research_institute,1
+USA,United States,Physiology or Medicine,male,2025,other,1

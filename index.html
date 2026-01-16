@@ -111,7 +111,6 @@
       .replaceAll("'", "&#039;");
   }
 
-  // Dedup: multiple affiliations per laureate -> 1 record per laureate/year/category/motivation
   function dedupLaureates(rows) {
     const seen = new Set();
     const out = [];
@@ -166,7 +165,6 @@
     `;
   }
 
-  // Stacked bar: un'unica barra "Team" segmentata Female/Male (+ eventualmente Unknown)
   function renderCompositionChart(year, category, stats) {
     const x = ["Team"];
 
@@ -237,7 +235,6 @@
     renderWinnersList(winners);
     renderCompositionChart(year, category, stats);
 
-    // opzionale: riassunto sotto (se non lo vuoi, lascia stringa vuota)
     els.status.textContent = "";
   }
 

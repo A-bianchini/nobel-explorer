@@ -1,7 +1,7 @@
 # Nobel Winners explorer
 
 <small>
-This repository provides a simple interactive visualization with insights on Nobel winners.<br> Data was retrieved using the official Nobel API https://api.nobelprize.org/2.1/laureates<br>
+This repository provides a simple interactive visualization with insights on Nobel winners. Data was retrieved using the official Nobel API https://api.nobelprize.org/2.1/laureates<br><br>
 
 <strong>Structure</strong><br>
 nobel-winners/<br>

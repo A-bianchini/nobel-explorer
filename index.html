@@ -37,7 +37,7 @@
       <h1>Nobel Prizes by Country</h1>
       <div class="hint">
         Choropleth “piatta” (equirectangular) basata sul <b>paese dell’affiliazione</b>.
-        Filtri: categoria, genere, tipo affiliazione, anno.
+        Filtri: categoria e anno.
       </div>
 
       <div class="row">
@@ -46,21 +46,10 @@
       </div>
 
       <div class="row">
-        <label for="gender">Genere</label>
-        <select id="gender"></select>
+        <label>Anno: <span id="yearLbl"></span></label>
+        <input id="year" type="range" />
+        <div class="small">Sposta lo slider per selezionare l’anno del premio.</div>
       </div>
-
-      <div class="row">
-        <label for="affType">Affiliation type</label>
-        <select id="affType"></select>
-      </div>
-
-      <div class="row">
-        <label>Anno (da <span id="yminLbl"></span> a <span id="ymaxLbl"></span>)</label>
-        <div class="rangeRow">
-          <input id="yearMin" type="range" />
-          <input id="yearMax" type="range" />
-        </div>
         <div class="small">
           Se il minimo supera il massimo, viene automaticamente corretto.
         </div>
@@ -121,16 +110,14 @@
   }
 
   function filterRows(allRows, state) {
-    return allRows.filter(r => {
-      if (state.category !== "__ALL__" && r.category !== state.category) return false;
-      if (state.gender !== "__ALL__" && r.gender !== state.gender) return false;
-      if (state.affiliation_type !== "__ALL__" && r.affiliation_type !== state.affiliation_type) return false;
-      if (r.year < state.yearMin || r.year > state.yearMax) return false;
-      return true;
-    });
-  }
+  return allRows.filter(r => {
+    if (state.category !== "__ALL__" && r.category !== state.category) return false;
+    if (state.year !== "__ALL__" && r.year !== state.year) return false;
+    return true;
+  });
+}
 
-  function aggregateByIso3(rows) {
+function aggregateByIso3(rows) {
     const m = new Map(); // iso3 -> {iso3, country, value}
     for (const r of rows) {
       if (!r.iso3) continue;
@@ -168,16 +155,24 @@
   }
 
   function makeLayout() {
-    return {
-      margin: {l:0, r:0, t:0, b:0},
-      geo: {
-        projection: { type: "equirectangular" },
-        showframe: false,
-        showcoastlines: false,
-        bgcolor: "white"
-      }
-    };
-  }
+  return {
+    margin: {l:0, r:0, t:0, b:0},
+    geo: {
+      projection: { type: "equirectangular" },
+      bgcolor: "white",
+      showframe: false,
+      showcoastlines: false,
+      showocean: false,
+      showland: true,
+      landcolor: "white",
+      showcountries: true,
+      countrycolor: "black",
+      countrywidth: 0.8,
+      showsubunits: false,
+      showlakes: false
+    }
+  };
+}
 
   function render(geojson, allRows, state) {
     const filtered = filterRows(allRows, state);
@@ -197,31 +192,23 @@
     ]);
 
     // UI elements
-    const categorySel = document.getElementById("category");
-    const genderSel = document.getElementById("gender");
-    const affTypeSel = document.getElementById("affType");
-    const yearMinEl = document.getElementById("yearMin");
-    const yearMaxEl = document.getElementById("yearMax");
+const categorySel = document.getElementById("category");
+const yearEl = document.getElementById("year");
 
     populateSelect(categorySel, meta.categories || [], "All categories");
-    populateSelect(genderSel, meta.genders || [], "All genders");
-    populateSelect(affTypeSel, meta.affiliation_types || [], "All affiliation types");
 
-    const yMin = meta.year_min ?? 1901;
-    const yMax = meta.year_max ?? 2025;
+const yMin = meta.year_min ?? 1901;
+const yMax = meta.year_max ?? 2025;
 
-    yearMinEl.min = yMin; yearMinEl.max = yMax; yearMinEl.value = yMin;
-    yearMaxEl.min = yMin; yearMaxEl.max = yMax; yearMaxEl.value = yMax;
-    document.getElementById("yminLbl").textContent = yMin;
-    document.getElementById("ymaxLbl").textContent = yMax;
+yearEl.min = yMin;
+yearEl.max = yMax;
+yearEl.value = yMax;
+document.getElementById("yearLbl").textContent = yearEl.value;
 
     const state = {
-      category: "__ALL__",
-      gender: "__ALL__",
-      affiliation_type: "__ALL__",
-      yearMin: yMin,
-      yearMax: yMax
-    };
+  category: "__ALL__",
+  year: "__ALL__" // "__ALL__" means all years
+};
 
     // Coverage warning (optional)
     const cov = meta.iso3_coverage ?? null;
@@ -236,34 +223,31 @@
     Plotly.newPlot("map", makeTrace(geojson, aggregateByIso3(allRows)), makeLayout(), {responsive:true, displaylogo:false});
     updateKPIs(aggregateByIso3(allRows));
 
-    function syncYear() {
-      if (+yearMinEl.value > +yearMaxEl.value) yearMinEl.value = yearMaxEl.value;
-      state.yearMin = +yearMinEl.value;
-      state.yearMax = +yearMaxEl.value;
-    }
+      function syncYearLabel() {
+    document.getElementById("yearLbl").textContent = yearEl.value;
+  }
 
-    // listeners
-    categorySel.addEventListener("change", () => { state.category = categorySel.value; render(geojson, allRows, state); });
-    genderSel.addEventListener("change", () => { state.gender = genderSel.value; render(geojson, allRows, state); });
-    affTypeSel.addEventListener("change", () => { state.affiliation_type = affTypeSel.value; render(geojson, allRows, state); });
+  // listeners
+  categorySel.addEventListener("change", () => {
+    state.category = categorySel.value;
+    render(geojson, allRows, state);
+  });
 
-    yearMinEl.addEventListener("input", () => { syncYear(); render(geojson, allRows, state); });
-    yearMaxEl.addEventListener("input", () => { syncYear(); render(geojson, allRows, state); });
+  yearEl.addEventListener("input", () => {
+    syncYearLabel();
+    state.year = +yearEl.value;
+    render(geojson, allRows, state);
+  });
 
-    document.getElementById("reset").addEventListener("click", () => {
-      categorySel.value = "__ALL__";
-      genderSel.value = "__ALL__";
-      affTypeSel.value = "__ALL__";
-      yearMinEl.value = yMin;
-      yearMaxEl.value = yMax;
-      state.category = "__ALL__";
-      state.gender = "__ALL__";
-      state.affiliation_type = "__ALL__";
-      state.yearMin = yMin;
-      state.yearMax = yMax;
-      render(geojson, allRows, state);
-    });
-  })().catch(err => {
+  document.getElementById("reset").addEventListener("click", () => {
+    categorySel.value = "__ALL__";
+    yearEl.value = yMax;
+    syncYearLabel();
+    state.category = "__ALL__";
+    state.year = "__ALL__";
+    render(geojson, allRows, state);
+  });
+})().catch(err => {
     console.error(err);
     document.body.innerHTML = `<pre style="padding:16px;">Error: ${err.message}</pre>`;
   });

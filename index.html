@@ -2,255 +2,264 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Nobel Prizes by Country (Affiliation) — Interactive Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nobel distribution — Top countries</title>
 
-  <!-- Plotly (CDN) -->
+  <!-- Plotly (grafico + tooltip) -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
+  <!-- PapaParse (CSV robusto) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <style>
-    :root { --border:#e7e7e7; --muted:#666; }
-    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#fff; color:#111; }
-    .wrap { display:grid; grid-template-columns: 340px 1fr; height:100vh; }
-    .panel { padding:16px; border-right:1px solid var(--border); overflow:auto; }
-    .panel h1 { font-size:18px; margin:0 0 10px; }
-    .hint { font-size:12px; color:var(--muted); line-height:1.35; margin-bottom:14px; }
-    .row { margin:12px 0; }
-    label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    :root { --bg:#fff; --fg:#111; --muted:#666; --border:#e6e6e6; --card:#fafafa; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:var(--fg); }
+    .wrap { max-width:1100px; margin:0 auto; padding:28px 16px 40px; }
+    h1 { margin:0 0 6px 0; font-size:22px; font-weight:700; }
+    .sub { margin:0 0 18px 0; color:var(--muted); font-size:13px; line-height:1.4; }
+    .panel {
+      display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px;
+      padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--card);
+      margin-bottom:14px;
+    }
+    .field label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
     select, input[type="range"] { width:100%; }
-    .rangeRow { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-    .kpi { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px; }
-    .kpi div { padding:8px 10px; border:1px solid var(--border); border-radius:12px; font-size:12px; }
-    .kpi b { font-size:14px; }
-    button { width:100%; padding:10px 12px; border:1px solid var(--border); background:#fff; border-radius:12px; cursor:pointer; }
-    button:hover { background:#fafafa; }
-    #map { width:100%; height:100%; }
-    .small { font-size:12px; color:var(--muted); margin-top:10px; }
-    .warn { font-size:12px; color:#8a5a00; background:#fff7e6; border:1px solid #ffe2a8; padding:10px; border-radius:12px; margin-top:12px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    select { padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:white; font-size:13px; }
+    .rangeRow { display:flex; align-items:center; gap:10px; }
+    .pill { font-size:12px; border:1px solid var(--border); background:white; padding:6px 10px; border-radius:999px; min-width:64px; text-align:center; }
+    #chart { border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .foot { margin-top:10px; font-size:12px; color:var(--muted); }
+    @media (max-width: 900px) { .panel { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 520px) { .panel { grid-template-columns: 1fr; } }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <aside class="panel">
-      <h1>Nobel Prizes by Country</h1>
-      <div class="hint">
-        Choropleth “piatta” (equirectangular) basata sul <b>paese dell’affiliazione</b>.
-        Filtri: categoria e anno.
+    <h1>Nobel distribution</h1>
+    <p class="sub">
+      Bar chart orizzontale — <b>Top N countries by Nobel count</b>.
+      Filtri: category, year, gender (optional), affiliation type (optional). Tooltip: paese + count.
+    </p>
+
+    <div class="panel">
+      <div class="field">
+        <label for="categorySel">Category</label>
+        <select id="categorySel"></select>
       </div>
 
-      <div class="row">
-        <label for="category">Categoria</label>
-        <select id="category"></select>
+      <div class="field">
+        <label for="genderSel">Gender (optional)</label>
+        <select id="genderSel"></select>
       </div>
 
-      <div class="row">
-        <label>Anno: <span id="yearLbl"></span></label>
-        <input id="year" type="range" />
-        <div class="small">Sposta lo slider per selezionare l’anno del premio.</div>
+      <div class="field">
+        <label for="affSel">Affiliation type (optional)</label>
+        <select id="affSel"></select>
       </div>
-        <div class="small">
-          Se il minimo supera il massimo, viene automaticamente corretto.
+
+      <div class="field">
+        <label for="topNSlider">Top N</label>
+        <div class="rangeRow">
+          <input id="topNSlider" type="range" min="5" max="30" step="1" value="15" />
+          <span class="pill" id="topNVal">15</span>
         </div>
       </div>
 
-      <div class="kpi">
-        <div>Totale (count): <b id="totalLbl">0</b></div>
-        <div>Paesi (ISO3): <b id="countriesLbl">0</b></div>
+      <div class="field" style="grid-column: 1 / -1;">
+        <label for="yearSlider">Year</label>
+        <div class="rangeRow">
+          <input id="yearSlider" type="range" />
+          <span class="pill" id="yearVal"></span>
+        </div>
       </div>
+    </div>
 
-      <div class="row">
-        <button id="reset">Reset filtri</button>
-      </div>
-
-      <div id="coverageBox" class="warn" style="display:none;"></div>
-
-      <div class="small">
-        Dati: <span class="mono">/data/nobel_country_agg.json</span><br/>
-        Confini: GeoJSON (ISO_A3) via CDN.
-      </div>
-    </aside>
-
-    <main id="map"></main>
+    <div id="chart"></div>
+    <div class="foot" id="status">Loading…</div>
   </div>
 
 <script>
-  // -----------------------
-  // CONFIG
-  // -----------------------
-  const DATA_AGG_URL  = "./data/nobel_country_agg.json";
-  const META_URL      = "./data/nobel_filters_meta.json";
+  // =========================
+  // CONFIG (tuoi file)
+  // =========================
+  const AGG_CSV_URL = "data/nobel_country_agg.csv";
+  const META_JSON_URL = "data/nobel_filters_meta.json";
 
-  // World countries polygons with properties.ISO_A3
-  // Source: datasets/geo-countries (GeoJSON) via jsDelivr CDN
-  const COUNTRIES_GEOJSON_URL = "https://cdn.jsdelivr.net/gh/datasets/geo-countries@master/data/countries.geojson";
+  // Dataset: colonne attese (dal tuo agg)
+  // iso3, country, category, gender, year, affiliation_type, count
 
-  // -----------------------
-  // HELPERS
-  // -----------------------
-  async function loadJSON(url) {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
-    return res.json();
-  }
+  let DATA = [];   // array di righe aggregate
+  let META = null; // meta filtri
 
-  function populateSelect(sel, values, allLabel) {
-    sel.innerHTML = "";
-    const optAll = document.createElement("option");
-    optAll.value = "__ALL__";
-    optAll.textContent = allLabel;
-    sel.appendChild(optAll);
+  const els = {
+    categorySel: document.getElementById("categorySel"),
+    genderSel: document.getElementById("genderSel"),
+    affSel: document.getElementById("affSel"),
+    yearSlider: document.getElementById("yearSlider"),
+    yearVal: document.getElementById("yearVal"),
+    topNSlider: document.getElementById("topNSlider"),
+    topNVal: document.getElementById("topNVal"),
+    status: document.getElementById("status"),
+  };
+
+  function setOptions(selectEl, values, includeAll = true) {
+    selectEl.innerHTML = "";
+    if (includeAll) {
+      const opt = document.createElement("option");
+      opt.value = "All";
+      opt.textContent = "All";
+      selectEl.appendChild(opt);
+    }
     values.forEach(v => {
-      const o = document.createElement("option");
-      o.value = v;
-      o.textContent = v;
-      sel.appendChild(o);
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = v;
+      selectEl.appendChild(opt);
     });
   }
 
-  function filterRows(allRows, state) {
-  return allRows.filter(r => {
-    if (state.category !== "__ALL__" && r.category !== state.category) return false;
-    if (state.year !== "__ALL__" && r.year !== state.year) return false;
-    return true;
-  });
-}
+  function getFilters() {
+    return {
+      category: els.categorySel.value,
+      gender: els.genderSel.value,
+      affiliation_type: els.affSel.value,
+      year: Number(els.yearSlider.value),
+      topN: Number(els.topNSlider.value),
+    };
+  }
 
-function aggregateByIso3(rows) {
-    const m = new Map(); // iso3 -> {iso3, country, value}
+  function applyFilters(rows, f) {
+    return rows.filter(r => {
+      if (r.year !== f.year) return false;
+      if (f.category !== "All" && r.category !== f.category) return false;
+      if (f.gender !== "All" && r.gender !== f.gender) return false;
+      if (f.affiliation_type !== "All" && r.affiliation_type !== f.affiliation_type) return false;
+      return true;
+    });
+  }
+
+  function sumByCountry(rows) {
+    const m = new Map();
     for (const r of rows) {
-      if (!r.iso3) continue;
-      const prev = m.get(r.iso3) || { iso3: r.iso3, country: r.country || r.iso3, value: 0 };
-      prev.value += (r.count ?? 0);
-      // keep the most recent country label if missing
-      if (!prev.country && r.country) prev.country = r.country;
-      m.set(r.iso3, prev);
+      const k = r.country || "unknown";
+      m.set(k, (m.get(k) || 0) + r.count);
     }
-    return Array.from(m.values());
+    return [...m.entries()]
+      .map(([country, count]) => ({ country, count }))
+      .sort((a,b) => b.count - a.count || a.country.localeCompare(b.country));
   }
 
-  function updateKPIs(agg) {
-    const total = agg.reduce((s, d) => s + d.value, 0);
-    document.getElementById("totalLbl").textContent = total.toLocaleString();
-    document.getElementById("countriesLbl").textContent = agg.length.toLocaleString();
+  function renderChart(top, f) {
+    const y = top.map(d => d.country).reverse();
+    const x = top.map(d => d.count).reverse();
+
+    const titleBits = [
+      `Top ${f.topN} countries — Nobel count`,
+      `Year: ${f.year}`,
+    ];
+    if (f.category !== "All") titleBits.push(`Category: ${f.category}`);
+    if (f.gender !== "All") titleBits.push(`Gender: ${f.gender}`);
+    if (f.affiliation_type !== "All") titleBits.push(`Affiliation: ${f.affiliation_type}`);
+
+    const trace = {
+      type: "bar",
+      orientation: "h",
+      y, x,
+      hovertemplate: "<b>%{y}</b><br>Count: %{x}<extra></extra>",
+    };
+
+    const layout = {
+      title: { text: titleBits.join(" • "), x: 0.02, xanchor: "left", font: { size: 14 } },
+      margin: { l: 150, r: 20, t: 60, b: 40 },
+      xaxis: { title: "Nobel count", rangemode: "tozero", gridcolor: "#f0f0f0", zerolinecolor: "#e6e6e6" },
+      yaxis: { title: "" },
+      paper_bgcolor: "#ffffff",
+      plot_bgcolor: "#ffffff",
+      height: Math.max(520, 26 * y.length + 140),
+    };
+
+    Plotly.react("chart", [trace], layout, { displayModeBar: false, responsive: true });
   }
 
-  function makeTrace(geojson, agg) {
-    const locations = agg.map(d => d.iso3);
-    const z = agg.map(d => d.value);
-    const text = agg.map(d => `${d.country}<br>Nobel: ${d.value.toLocaleString()}`);
+  function update() {
+    const f = getFilters();
+    els.yearVal.textContent = f.year;
+    els.topNVal.textContent = f.topN;
 
-    return [{
-      type: "choropleth",
-      geojson: geojson,
-      featureidkey: "properties.ISO_A3",
-      locations,
-      z,
-      text,
-      hovertemplate: "%{text}<extra></extra>",
-      marker: { line: { width: 0.2 } },
-      colorbar: { title: "Count" }
-    }];
+    const filtered = applyFilters(DATA, f);
+    const summed = sumByCountry(filtered);
+    const top = summed.slice(0, f.topN);
+
+    els.status.textContent =
+      `Rows matched: ${filtered.length.toLocaleString()} • Countries shown: ${top.length.toLocaleString()}`;
+
+    renderChart(top, f);
   }
 
-  function makeLayout() {
-  return {
-    margin: {l:0, r:0, t:0, b:0},
-    geo: {
-      projection: { type: "equirectangular" },
-      bgcolor: "white",
-      showframe: false,
-      showcoastlines: false,
-      showocean: false,
-      showland: true,
-      landcolor: "white",
-      showcountries: true,
-      countrycolor: "black",
-      countrywidth: 0.8,
-      showsubunits: false,
-      showlakes: false
+  async function loadMeta() {
+    const res = await fetch(META_JSON_URL);
+    if (!res.ok) throw new Error(`Cannot load ${META_JSON_URL} (${res.status})`);
+    return await res.json();
+  }
+
+  async function loadAggCsv() {
+    return new Promise((resolve, reject) => {
+      Papa.parse(AGG_CSV_URL, {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: (results) => resolve(results.data),
+        error: (err) => reject(err),
+      });
+    });
+  }
+
+  async function init() {
+    try {
+      // 1) meta filtri (categorie, gender, affiliation_types, year_min/max)
+      META = await loadMeta();
+
+      setOptions(els.categorySel, META.categories ?? [], true);
+      setOptions(els.genderSel, META.genders ?? [], true);
+      setOptions(els.affSel, META.affiliation_types ?? [], true);
+
+      // slider anni
+      const yMin = META.year_min ?? 1901;
+      const yMax = META.year_max ?? 2025;
+      els.yearSlider.min = String(yMin);
+      els.yearSlider.max = String(yMax);
+      els.yearSlider.step = "1";
+      els.yearSlider.value = String(yMax);
+      els.yearVal.textContent = String(yMax);
+
+      // 2) dati aggregati
+      const raw = await loadAggCsv();
+
+      // normalizza tipi
+      DATA = raw.map(r => ({
+        iso3: (r.iso3 ?? "").toString(),
+        country: (r.country ?? "unknown").toString(),
+        category: (r.category ?? "unknown").toString(),
+        gender: (r.gender ?? "unknown").toString(),
+        year: Number(r.year),
+        affiliation_type: (r.affiliation_type ?? "unknown").toString(),
+        count: Number(r.count) || 0,
+      })).filter(r => Number.isFinite(r.year) && r.count > 0);
+
+      // listeners
+      [els.categorySel, els.genderSel, els.affSel].forEach(el => el.addEventListener("change", update));
+      [els.yearSlider, els.topNSlider].forEach(el => el.addEventListener("input", update));
+
+      update();
+    } catch (e) {
+      console.error(e);
+      els.status.textContent = `Error: ${e.message}`;
     }
-  };
-}
-
-  function render(geojson, allRows, state) {
-    const filtered = filterRows(allRows, state);
-    const agg = aggregateByIso3(filtered);
-    updateKPIs(agg);
-    Plotly.react("map", makeTrace(geojson, agg), makeLayout(), {responsive:true, displaylogo:false});
   }
 
-  // -----------------------
-  // MAIN
-  // -----------------------
-  (async function main() {
-    const [geojson, allRows, meta] = await Promise.all([
-      loadJSON(COUNTRIES_GEOJSON_URL),
-      loadJSON(DATA_AGG_URL),
-      loadJSON(META_URL)
-    ]);
-
-    // UI elements
-const categorySel = document.getElementById("category");
-const yearEl = document.getElementById("year");
-
-    populateSelect(categorySel, meta.categories || [], "All categories");
-
-const yMin = meta.year_min ?? 1901;
-const yMax = meta.year_max ?? 2025;
-
-yearEl.min = yMin;
-yearEl.max = yMax;
-yearEl.value = yMax;
-document.getElementById("yearLbl").textContent = yearEl.value;
-
-    const state = {
-  category: "__ALL__",
-  year: "__ALL__" // "__ALL__" means all years
-};
-
-    // Coverage warning (optional)
-    const cov = meta.iso3_coverage ?? null;
-    if (cov !== null) {
-      const box = document.getElementById("coverageBox");
-      box.style.display = "block";
-      box.innerHTML = `ISO3 coverage (mappable rows): <b>${(cov*100).toFixed(1)}%</b>.<br/>
-        Se vuoi aumentarla, serve migliorare la normalizzazione paese → ISO3 nel preprocessing.`;
-    }
-
-    // first render
-    Plotly.newPlot("map", makeTrace(geojson, aggregateByIso3(allRows)), makeLayout(), {responsive:true, displaylogo:false});
-    updateKPIs(aggregateByIso3(allRows));
-
-      function syncYearLabel() {
-    document.getElementById("yearLbl").textContent = yearEl.value;
-  }
-
-  // listeners
-  categorySel.addEventListener("change", () => {
-    state.category = categorySel.value;
-    render(geojson, allRows, state);
-  });
-
-  yearEl.addEventListener("input", () => {
-    syncYearLabel();
-    state.year = +yearEl.value;
-    render(geojson, allRows, state);
-  });
-
-  document.getElementById("reset").addEventListener("click", () => {
-    categorySel.value = "__ALL__";
-    yearEl.value = yMax;
-    syncYearLabel();
-    state.category = "__ALL__";
-    state.year = "__ALL__";
-    render(geojson, allRows, state);
-  });
-})().catch(err => {
-    console.error(err);
-    document.body.innerHTML = `<pre style="padding:16px;">Error: ${err.message}</pre>`;
-  });
+  init();
 </script>
 </body>
 </html>

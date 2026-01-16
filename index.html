@@ -188,15 +188,15 @@
       hovertemplate: "<b>Male</b><br>Count: %{y}<extra></extra>",
     };
 
-    // Se vuoi includere Unknown nel team (io lo lascio solo se esiste)
     const traces = [traceFemale, traceMale];
+
     if (stats.unknown > 0) {
       traces.push({
         type: "bar",
         x,
         y: [stats.unknown],
         name: "Unknown",
-        marker: { color: ""#bdbdbd"" },
+        marker: { color: "#bdbdbd" },
         hovertemplate: "<b>Unknown</b><br>Count: %{y}<extra></extra>",
       });
     }
@@ -206,7 +206,7 @@
       barmode: "stack",
       margin: { l: 60, r: 20, t: 60, b: 55 },
       yaxis: {
-        title: " ",
+        title: "",
         rangemode: "tozero",
         tickmode: "linear",
         tick0: 0,
@@ -236,6 +236,10 @@
 
     renderWinnersList(winners);
     renderCompositionChart(year, category, stats);
+
+    // opzionale: riassunto sotto (se non lo vuoi, lascia stringa vuota)
+    els.status.textContent = "";
+  }
 
   async function loadMeta() {
     const res = await fetch(META_JSON_URL);

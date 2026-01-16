@@ -17,6 +17,7 @@
     .wrap { max-width:1100px; margin:0 auto; padding:28px 16px 40px; }
     h1 { margin:0 0 6px 0; font-size:22px; font-weight:700; }
     .sub { margin:0 0 18px 0; color:var(--muted); font-size:13px; line-height:1.4; }
+
     .panel {
       display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px;
       padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--card);
@@ -27,8 +28,10 @@
     select { padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:white; font-size:13px; }
     .rangeRow { display:flex; align-items:center; gap:10px; }
     .pill { font-size:12px; border:1px solid var(--border); background:white; padding:6px 10px; border-radius:999px; min-width:64px; text-align:center; }
+
     #chart { border:1px solid var(--border); border-radius:12px; overflow:hidden; }
     .foot { margin-top:10px; font-size:12px; color:var(--muted); }
+
     @media (max-width: 900px) { .panel { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 520px) { .panel { grid-template-columns: 1fr; } }
   </style>
@@ -39,7 +42,7 @@
     <h1>Nobel distribution</h1>
     <p class="sub">
       Bar chart orizzontale — <b>Top N countries by Nobel count</b>.
-      Filtri: category, year, gender (optional), affiliation type (optional). Tooltip: paese + count.
+      Seleziona l’anno: puoi vedere <b>tutte le categorie</b> o una sola; filtra per gender e per affiliation (University / Research institute / Organization).
     </p>
 
     <div class="panel">
@@ -49,12 +52,12 @@
       </div>
 
       <div class="field">
-        <label for="genderSel">Gender (optional)</label>
+        <label for="genderSel">Gender</label>
         <select id="genderSel"></select>
       </div>
 
       <div class="field">
-        <label for="affSel">Affiliation type (optional)</label>
+        <label for="affSel">Affiliation</label>
         <select id="affSel"></select>
       </div>
 
@@ -86,10 +89,18 @@
   const AGG_CSV_URL = "data/nobel_country_agg.csv";
   const META_JSON_URL = "data/nobel_filters_meta.json";
 
-  // Dataset: colonne attese (dal tuo agg)
-  // iso3, country, category, gender, year, affiliation_type, count
+  // Opzioni affiliazione richieste:
+  // - university
+  // - research_institute
+  // - organization = (company + government + other)
+  const AFF_UI = [
+    { value: "All", label: "All" },
+    { value: "university", label: "University" },
+    { value: "research_institute", label: "Research institute" },
+    { value: "organization", label: "Organization" },
+  ];
 
-  let DATA = [];   // array di righe aggregate
+  let DATA = [];   // righe aggregate
   let META = null; // meta filtri
 
   const els = {
@@ -103,38 +114,52 @@
     status: document.getElementById("status"),
   };
 
-  function setOptions(selectEl, values, includeAll = true) {
+  function setOptions(selectEl, options) {
     selectEl.innerHTML = "";
-    if (includeAll) {
-      const opt = document.createElement("option");
-      opt.value = "All";
-      opt.textContent = "All";
-      selectEl.appendChild(opt);
-    }
-    values.forEach(v => {
-      const opt = document.createElement("option");
-      opt.value = v;
-      opt.textContent = v;
-      selectEl.appendChild(opt);
+    options.forEach(opt => {
+      const o = document.createElement("option");
+      o.value = opt.value;
+      o.textContent = opt.label;
+      selectEl.appendChild(o);
     });
+  }
+
+  function toTitle(x) {
+    if (!x) return "";
+    return x.toString();
   }
 
   function getFilters() {
     return {
-      category: els.categorySel.value,
-      gender: els.genderSel.value,
-      affiliation_type: els.affSel.value,
+      category: els.categorySel.value,  // "All" o nome categoria
+      gender: els.genderSel.value,      // "All" / female / male
+      affiliation: els.affSel.value,    // "All" / university / research_institute / organization
       year: Number(els.yearSlider.value),
       topN: Number(els.topNSlider.value),
     };
   }
 
+  function mapAffiliationToUI(affTypeRaw) {
+    const a = (affTypeRaw ?? "").toString();
+    if (a === "university") return "university";
+    if (a === "research_institute") return "research_institute";
+    // tutto il resto finisce in organization
+    return "organization";
+  }
+
   function applyFilters(rows, f) {
     return rows.filter(r => {
       if (r.year !== f.year) return false;
+
+      // category: All = tutte
       if (f.category !== "All" && r.category !== f.category) return false;
+
+      // gender: All = tutti
       if (f.gender !== "All" && r.gender !== f.gender) return false;
-      if (f.affiliation_type !== "All" && r.affiliation_type !== f.affiliation_type) return false;
+
+      // affiliation: All = tutti, altrimenti usa il mapping a 3 gruppi
+      if (f.affiliation !== "All" && r.aff_ui !== f.affiliation) return false;
+
       return true;
     });
   }
@@ -157,10 +182,15 @@
     const titleBits = [
       `Top ${f.topN} countries — Nobel count`,
       `Year: ${f.year}`,
+      (f.category === "All" ? "Category: All categories" : `Category: ${f.category}`),
+      (f.gender === "All" ? "Gender: All" : `Gender: ${f.gender}`),
+      (() => {
+        if (f.affiliation === "All") return "Affiliation: All";
+        if (f.affiliation === "university") return "Affiliation: University";
+        if (f.affiliation === "research_institute") return "Affiliation: Research institute";
+        return "Affiliation: Organization";
+      })()
     ];
-    if (f.category !== "All") titleBits.push(`Category: ${f.category}`);
-    if (f.gender !== "All") titleBits.push(`Gender: ${f.gender}`);
-    if (f.affiliation_type !== "All") titleBits.push(`Affiliation: ${f.affiliation_type}`);
 
     const trace = {
       type: "bar",
@@ -171,12 +201,18 @@
 
     const layout = {
       title: { text: titleBits.join(" • "), x: 0.02, xanchor: "left", font: { size: 14 } },
-      margin: { l: 150, r: 20, t: 60, b: 40 },
-      xaxis: { title: "Nobel count", rangemode: "tozero", gridcolor: "#f0f0f0", zerolinecolor: "#e6e6e6" },
+      margin: { l: 160, r: 20, t: 70, b: 40 },
+      xaxis: {
+        title: "Nobel count",
+        rangemode: "tozero",
+        gridcolor: "#f0f0f0",
+        zerolinecolor: "#e6e6e6",
+        ticks: "outside"
+      },
       yaxis: { title: "" },
       paper_bgcolor: "#ffffff",
       plot_bgcolor: "#ffffff",
-      height: Math.max(520, 26 * y.length + 140),
+      height: Math.max(520, 26 * y.length + 150),
     };
 
     Plotly.react("chart", [trace], layout, { displayModeBar: false, responsive: true });
@@ -191,8 +227,9 @@
     const summed = sumByCountry(filtered);
     const top = summed.slice(0, f.topN);
 
+    const affNote = "Organization = company + government + other";
     els.status.textContent =
-      `Rows matched: ${filtered.length.toLocaleString()} • Countries shown: ${top.length.toLocaleString()}`;
+      `Rows matched: ${filtered.length.toLocaleString()} • Countries shown: ${top.length.toLocaleString()} • ${affNote}`;
 
     renderChart(top, f);
   }
@@ -218,12 +255,20 @@
 
   async function init() {
     try {
-      // 1) meta filtri (categorie, gender, affiliation_types, year_min/max)
       META = await loadMeta();
 
-      setOptions(els.categorySel, META.categories ?? [], true);
-      setOptions(els.genderSel, META.genders ?? [], true);
-      setOptions(els.affSel, META.affiliation_types ?? [], true);
+      // Category: aggiungo esplicitamente "All categories"
+      const categoryOptions = [{ value: "All", label: "All categories" }]
+        .concat((META.categories ?? []).map(c => ({ value: c, label: c })));
+      setOptions(els.categorySel, categoryOptions);
+
+      // Gender: All / female / male (dal meta)
+      const genderOptions = [{ value: "All", label: "All" }]
+        .concat((META.genders ?? []).map(g => ({ value: g, label: toTitle(g) })));
+      setOptions(els.genderSel, genderOptions);
+
+      // Affiliation: solo quelle 3 richieste + All
+      setOptions(els.affSel, AFF_UI);
 
       // slider anni
       const yMin = META.year_min ?? 1901;
@@ -234,10 +279,8 @@
       els.yearSlider.value = String(yMax);
       els.yearVal.textContent = String(yMax);
 
-      // 2) dati aggregati
+      // dati
       const raw = await loadAggCsv();
-
-      // normalizza tipi
       DATA = raw.map(r => ({
         iso3: (r.iso3 ?? "").toString(),
         country: (r.country ?? "unknown").toString(),
@@ -245,6 +288,7 @@
         gender: (r.gender ?? "unknown").toString(),
         year: Number(r.year),
         affiliation_type: (r.affiliation_type ?? "unknown").toString(),
+        aff_ui: mapAffiliationToUI(r.affiliation_type),
         count: Number(r.count) || 0,
       })).filter(r => Number.isFinite(r.year) && r.count > 0);
 

@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nobel distribution — Top countries</title>
 
-  <!-- Plotly (grafico + tooltip) -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-
-  <!-- PapaParse (CSV robusto) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
@@ -19,7 +16,7 @@
     .sub { margin:0 0 18px 0; color:var(--muted); font-size:13px; line-height:1.4; }
 
     .panel {
-      display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px;
+      display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;
       padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--card);
       margin-bottom:14px;
     }
@@ -32,8 +29,7 @@
     #chart { border:1px solid var(--border); border-radius:12px; overflow:hidden; }
     .foot { margin-top:10px; font-size:12px; color:var(--muted); }
 
-    @media (max-width: 900px) { .panel { grid-template-columns: 1fr 1fr; } }
-    @media (max-width: 520px) { .panel { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .panel { grid-template-columns: 1fr; } }
   </style>
 </head>
 
@@ -41,8 +37,8 @@
   <div class="wrap">
     <h1>Nobel distribution</h1>
     <p class="sub">
-      Bar chart orizzontale — <b>Top N countries by Nobel count</b>.
-      Seleziona l’anno: puoi vedere <b>tutte le categorie</b> o una sola; filtra per gender e per affiliation (University / Research institute / Organization).
+      Bar chart orizzontale — <b>Countries by Nobel count</b> per anno.
+      Puoi sommare <b>tutte le categorie</b> oppure selezionarne una, e filtrare per gender e affiliation.
     </p>
 
     <div class="panel">
@@ -61,14 +57,6 @@
         <select id="affSel"></select>
       </div>
 
-      <div class="field">
-        <label for="topNSlider">Top N</label>
-        <div class="rangeRow">
-          <input id="topNSlider" type="range" min="5" max="30" step="1" value="15" />
-          <span class="pill" id="topNVal">15</span>
-        </div>
-      </div>
-
       <div class="field" style="grid-column: 1 / -1;">
         <label for="yearSlider">Year</label>
         <div class="rangeRow">
@@ -84,24 +72,20 @@
 
 <script>
   // =========================
-  // CONFIG (tuoi file)
+  // CONFIG
   // =========================
   const AGG_CSV_URL = "data/nobel_country_agg.csv";
   const META_JSON_URL = "data/nobel_filters_meta.json";
 
-  // Opzioni affiliazione richieste:
-  // - university
-  // - research_institute
-  // - organization = (company + government + other)
   const AFF_UI = [
     { value: "All", label: "All" },
     { value: "university", label: "University" },
     { value: "research_institute", label: "Research institute" },
-    { value: "organization", label: "Organization" },
+    { value: "organization", label: "Organization" }, // company + government + other
   ];
 
-  let DATA = [];   // righe aggregate
-  let META = null; // meta filtri
+  let DATA = [];
+  let META = null;
 
   const els = {
     categorySel: document.getElementById("categorySel"),
@@ -109,8 +93,6 @@
     affSel: document.getElementById("affSel"),
     yearSlider: document.getElementById("yearSlider"),
     yearVal: document.getElementById("yearVal"),
-    topNSlider: document.getElementById("topNSlider"),
-    topNVal: document.getElementById("topNVal"),
     status: document.getElementById("status"),
   };
 
@@ -124,42 +106,27 @@
     });
   }
 
-  function toTitle(x) {
-    if (!x) return "";
-    return x.toString();
-  }
-
   function getFilters() {
     return {
-      category: els.categorySel.value,  // "All" o nome categoria
-      gender: els.genderSel.value,      // "All" / female / male
-      affiliation: els.affSel.value,    // "All" / university / research_institute / organization
+      category: els.categorySel.value,
+      gender: els.genderSel.value,
+      affiliation: els.affSel.value,
       year: Number(els.yearSlider.value),
-      topN: Number(els.topNSlider.value),
     };
   }
 
-  function mapAffiliationToUI(affTypeRaw) {
-    const a = (affTypeRaw ?? "").toString();
+  function mapAffiliationToUI(a) {
     if (a === "university") return "university";
     if (a === "research_institute") return "research_institute";
-    // tutto il resto finisce in organization
     return "organization";
   }
 
   function applyFilters(rows, f) {
     return rows.filter(r => {
       if (r.year !== f.year) return false;
-
-      // category: All = tutte
       if (f.category !== "All" && r.category !== f.category) return false;
-
-      // gender: All = tutti
       if (f.gender !== "All" && r.gender !== f.gender) return false;
-
-      // affiliation: All = tutti, altrimenti usa il mapping a 3 gruppi
       if (f.affiliation !== "All" && r.aff_ui !== f.affiliation) return false;
-
       return true;
     });
   }
@@ -175,20 +142,19 @@
       .sort((a,b) => b.count - a.count || a.country.localeCompare(b.country));
   }
 
-  function renderChart(top, f) {
-    const y = top.map(d => d.country).reverse();
-    const x = top.map(d => d.count).reverse();
+  function renderChart(data, f) {
+    const y = data.map(d => d.country).reverse();
+    const x = data.map(d => d.count).reverse();
 
     const titleBits = [
-      `Top ${f.topN} countries — Nobel count`,
-      `Year: ${f.year}`,
-      (f.category === "All" ? "Category: All categories" : `Category: ${f.category}`),
-      (f.gender === "All" ? "Gender: All" : `Gender: ${f.gender}`),
+      `Nobel count by country — ${f.year}`,
+      (f.category === "All" ? "All categories" : `Category: ${f.category}`),
+      (f.gender === "All" ? "All genders" : `Gender: ${f.gender}`),
       (() => {
-        if (f.affiliation === "All") return "Affiliation: All";
-        if (f.affiliation === "university") return "Affiliation: University";
-        if (f.affiliation === "research_institute") return "Affiliation: Research institute";
-        return "Affiliation: Organization";
+        if (f.affiliation === "All") return "All affiliations";
+        if (f.affiliation === "university") return "University";
+        if (f.affiliation === "research_institute") return "Research institute";
+        return "Organization";
       })()
     ];
 
@@ -196,18 +162,20 @@
       type: "bar",
       orientation: "h",
       y, x,
-      hovertemplate: "<b>%{y}</b><br>Count: %{x}<extra></extra>",
+      hovertemplate: "<b>%{y}</b><br>Nobel prizes: %{x}<extra></extra>",
     };
 
     const layout = {
       title: { text: titleBits.join(" • "), x: 0.02, xanchor: "left", font: { size: 14 } },
-      margin: { l: 160, r: 20, t: 70, b: 40 },
+      margin: { l: 170, r: 20, t: 70, b: 50 },
       xaxis: {
-        title: "Nobel count",
+        title: "Number of Nobel prizes",
         rangemode: "tozero",
+        tickmode: "linear",
+        tick0: 0,
+        dtick: 1,
         gridcolor: "#f0f0f0",
-        zerolinecolor: "#e6e6e6",
-        ticks: "outside"
+        zerolinecolor: "#e6e6e6"
       },
       yaxis: { title: "" },
       paper_bgcolor: "#ffffff",
@@ -221,17 +189,14 @@
   function update() {
     const f = getFilters();
     els.yearVal.textContent = f.year;
-    els.topNVal.textContent = f.topN;
 
     const filtered = applyFilters(DATA, f);
     const summed = sumByCountry(filtered);
-    const top = summed.slice(0, f.topN);
 
-    const affNote = "Organization = company + government + other";
     els.status.textContent =
-      `Rows matched: ${filtered.length.toLocaleString()} • Countries shown: ${top.length.toLocaleString()} • ${affNote}`;
+      `Countries shown: ${summed.length.toLocaleString()} • Organization = company + government + other`;
 
-    renderChart(top, f);
+    renderChart(summed, f);
   }
 
   async function loadMeta() {
@@ -257,20 +222,20 @@
     try {
       META = await loadMeta();
 
-      // Category: aggiungo esplicitamente "All categories"
-      const categoryOptions = [{ value: "All", label: "All categories" }]
+      // Category
+      const catOpts = [{ value: "All", label: "All categories" }]
         .concat((META.categories ?? []).map(c => ({ value: c, label: c })));
-      setOptions(els.categorySel, categoryOptions);
+      setOptions(els.categorySel, catOpts);
 
-      // Gender: All / female / male (dal meta)
-      const genderOptions = [{ value: "All", label: "All" }]
-        .concat((META.genders ?? []).map(g => ({ value: g, label: toTitle(g) })));
-      setOptions(els.genderSel, genderOptions);
+      // Gender
+      const genOpts = [{ value: "All", label: "All" }]
+        .concat((META.genders ?? []).map(g => ({ value: g, label: g })));
+      setOptions(els.genderSel, genOpts);
 
-      // Affiliation: solo quelle 3 richieste + All
+      // Affiliation (3 gruppi)
       setOptions(els.affSel, AFF_UI);
 
-      // slider anni
+      // Year slider
       const yMin = META.year_min ?? 1901;
       const yMax = META.year_max ?? 2025;
       els.yearSlider.min = String(yMin);
@@ -279,22 +244,20 @@
       els.yearSlider.value = String(yMax);
       els.yearVal.textContent = String(yMax);
 
-      // dati
+      // Data
       const raw = await loadAggCsv();
       DATA = raw.map(r => ({
-        iso3: (r.iso3 ?? "").toString(),
         country: (r.country ?? "unknown").toString(),
         category: (r.category ?? "unknown").toString(),
         gender: (r.gender ?? "unknown").toString(),
         year: Number(r.year),
-        affiliation_type: (r.affiliation_type ?? "unknown").toString(),
         aff_ui: mapAffiliationToUI(r.affiliation_type),
         count: Number(r.count) || 0,
       })).filter(r => Number.isFinite(r.year) && r.count > 0);
 
       // listeners
       [els.categorySel, els.genderSel, els.affSel].forEach(el => el.addEventListener("change", update));
-      [els.yearSlider, els.topNSlider].forEach(el => el.addEventListener("input", update));
+      els.yearSlider.addEventListener("input", update);
 
       update();
     } catch (e) {
@@ -307,3 +270,4 @@
 </script>
 </body>
 </html>
+

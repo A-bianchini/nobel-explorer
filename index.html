@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nobel Prizes by Country (Affiliation) — Interactive Map</title>
+
+  <!-- Plotly (CDN) -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <style>
+    :root { --border:#e7e7e7; --muted:#666; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background:#fff; color:#111; }
+    .wrap { display:grid; grid-template-columns: 340px 1fr; height:100vh; }
+    .panel { padding:16px; border-right:1px solid var(--border); overflow:auto; }
+    .panel h1 { font-size:18px; margin:0 0 10px; }
+    .hint { font-size:12px; color:var(--muted); line-height:1.35; margin-bottom:14px; }
+    .row { margin:12px 0; }
+    label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    select, input[type="range"] { width:100%; }
+    .rangeRow { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .kpi { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px; }
+    .kpi div { padding:8px 10px; border:1px solid var(--border); border-radius:12px; font-size:12px; }
+    .kpi b { font-size:14px; }
+    button { width:100%; padding:10px 12px; border:1px solid var(--border); background:#fff; border-radius:12px; cursor:pointer; }
+    button:hover { background:#fafafa; }
+    #map { width:100%; height:100%; }
+    .small { font-size:12px; color:var(--muted); margin-top:10px; }
+    .warn { font-size:12px; color:#8a5a00; background:#fff7e6; border:1px solid #ffe2a8; padding:10px; border-radius:12px; margin-top:12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <aside class="panel">
+      <h1>Nobel Prizes by Country</h1>
+      <div class="hint">
+        Choropleth “piatta” (equirectangular) basata sul <b>paese dell’affiliazione</b>.
+        Filtri: categoria, genere, tipo affiliazione, anno.
+      </div>
+
+      <div class="row">
+        <label for="category">Categoria</label>
+        <select id="category"></select>
+      </div>
+
+      <div class="row">
+        <label for="gender">Genere</label>
+        <select id="gender"></select>
+      </div>
+
+      <div class="row">
+        <label for="affType">Affiliation type</label>
+        <select id="affType"></select>
+      </div>
+
+      <div class="row">
+        <label>Anno (da <span id="yminLbl"></span> a <span id="ymaxLbl"></span>)</label>
+        <div class="rangeRow">
+          <input id="yearMin" type="range" />
+          <input id="yearMax" type="range" />
+        </div>
+        <div class="small">
+          Se il minimo supera il massimo, viene automaticamente corretto.
+        </div>
+      </div>
+
+      <div class="kpi">
+        <div>Totale (count): <b id="totalLbl">0</b></div>
+        <div>Paesi (ISO3): <b id="countriesLbl">0</b></div>
+      </div>
+
+      <div class="row">
+        <button id="reset">Reset filtri</button>
+      </div>
+
+      <div id="coverageBox" class="warn" style="display:none;"></div>
+
+      <div class="small">
+        Dati: <span class="mono">/data/nobel_country_agg.json</span><br/>
+        Confini: GeoJSON (ISO_A3) via CDN.
+      </div>
+    </aside>
+
+    <main id="map"></main>
+  </div>
+
+<script>
+  // -----------------------
+  // CONFIG
+  // -----------------------
+  const DATA_AGG_URL  = "./data/nobel_country_agg.json";
+  const META_URL      = "./data/nobel_filters_meta.json";
+
+  // World countries polygons with properties.ISO_A3
+  // Source: datasets/geo-countries (GeoJSON) via jsDelivr CDN
+  const COUNTRIES_GEOJSON_URL = "https://cdn.jsdelivr.net/gh/datasets/geo-countries@master/data/countries.geojson";
+
+  // -----------------------
+  // HELPERS
+  // -----------------------
+  async function loadJSON(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to load ${url}: ${res.status}`);
+    return res.json();
+  }
+
+  function populateSelect(sel, values, allLabel) {
+    sel.innerHTML = "";
+    const optAll = document.createElement("option");
+    optAll.value = "__ALL__";
+    optAll.textContent = allLabel;
+    sel.appendChild(optAll);
+    values.forEach(v => {
+      const o = document.createElement("option");
+      o.value = v;
+      o.textContent = v;
+      sel.appendChild(o);
+    });
+  }
+
+  function filterRows(allRows, state) {
+    return allRows.filter(r => {
+      if (state.category !== "__ALL__" && r.category !== state.category) return false;
+      if (state.gender !== "__ALL__" && r.gender !== state.gender) return false;
+      if (state.affiliation_type !== "__ALL__" && r.affiliation_type !== state.affiliation_type) return false;
+      if (r.year < state.yearMin || r.year > state.yearMax) return false;
+      return true;
+    });
+  }
+
+  function aggregateByIso3(rows) {
+    const m = new Map(); // iso3 -> {iso3, country, value}
+    for (const r of rows) {
+      if (!r.iso3) continue;
+      const prev = m.get(r.iso3) || { iso3: r.iso3, country: r.country || r.iso3, value: 0 };
+      prev.value += (r.count ?? 0);
+      // keep the most recent country label if missing
+      if (!prev.country && r.country) prev.country = r.country;
+      m.set(r.iso3, prev);
+    }
+    return Array.from(m.values());
+  }
+
+  function updateKPIs(agg) {
+    const total = agg.reduce((s, d) => s + d.value, 0);
+    document.getElementById("totalLbl").textContent = total.toLocaleString();
+    document.getElementById("countriesLbl").textContent = agg.length.toLocaleString();
+  }
+
+  function makeTrace(geojson, agg) {
+    const locations = agg.map(d => d.iso3);
+    const z = agg.map(d => d.value);
+    const text = agg.map(d => `${d.country}<br>Nobel: ${d.value.toLocaleString()}`);
+
+    return [{
+      type: "choropleth",
+      geojson: geojson,
+      featureidkey: "properties.ISO_A3",
+      locations,
+      z,
+      text,
+      hovertemplate: "%{text}<extra></extra>",
+      marker: { line: { width: 0.2 } },
+      colorbar: { title: "Count" }
+    }];
+  }
+
+  function makeLayout() {
+    return {
+      margin: {l:0, r:0, t:0, b:0},
+      geo: {
+        projection: { type: "equirectangular" },
+        showframe: false,
+        showcoastlines: false,
+        bgcolor: "white"
+      }
+    };
+  }
+
+  function render(geojson, allRows, state) {
+    const filtered = filterRows(allRows, state);
+    const agg = aggregateByIso3(filtered);
+    updateKPIs(agg);
+    Plotly.react("map", makeTrace(geojson, agg), makeLayout(), {responsive:true, displaylogo:false});
+  }
+
+  // -----------------------
+  // MAIN
+  // -----------------------
+  (async function main() {
+    const [geojson, allRows, meta] = await Promise.all([
+      loadJSON(COUNTRIES_GEOJSON_URL),
+      loadJSON(DATA_AGG_URL),
+      loadJSON(META_URL)
+    ]);
+
+    // UI elements
+    const categorySel = document.getElementById("category");
+    const genderSel = document.getElementById("gender");
+    const affTypeSel = document.getElementById("affType");
+    const yearMinEl = document.getElementById("yearMin");
+    const yearMaxEl = document.getElementById("yearMax");
+
+    populateSelect(categorySel, meta.categories || [], "All categories");
+    populateSelect(genderSel, meta.genders || [], "All genders");
+    populateSelect(affTypeSel, meta.affiliation_types || [], "All affiliation types");
+
+    const yMin = meta.year_min ?? 1901;
+    const yMax = meta.year_max ?? 2025;
+
+    yearMinEl.min = yMin; yearMinEl.max = yMax; yearMinEl.value = yMin;
+    yearMaxEl.min = yMin; yearMaxEl.max = yMax; yearMaxEl.value = yMax;
+    document.getElementById("yminLbl").textContent = yMin;
+    document.getElementById("ymaxLbl").textContent = yMax;
+
+    const state = {
+      category: "__ALL__",
+      gender: "__ALL__",
+      affiliation_type: "__ALL__",
+      yearMin: yMin,
+      yearMax: yMax
+    };
+
+    // Coverage warning (optional)
+    const cov = meta.iso3_coverage ?? null;
+    if (cov !== null) {
+      const box = document.getElementById("coverageBox");
+      box.style.display = "block";
+      box.innerHTML = `ISO3 coverage (mappable rows): <b>${(cov*100).toFixed(1)}%</b>.<br/>
+        Se vuoi aumentarla, serve migliorare la normalizzazione paese → ISO3 nel preprocessing.`;
+    }
+
+    // first render
+    Plotly.newPlot("map", makeTrace(geojson, aggregateByIso3(allRows)), makeLayout(), {responsive:true, displaylogo:false});
+    updateKPIs(aggregateByIso3(allRows));
+
+    function syncYear() {
+      if (+yearMinEl.value > +yearMaxEl.value) yearMinEl.value = yearMaxEl.value;
+      state.yearMin = +yearMinEl.value;
+      state.yearMax = +yearMaxEl.value;
+    }
+
+    // listeners
+    categorySel.addEventListener("change", () => { state.category = categorySel.value; render(geojson, allRows, state); });
+    genderSel.addEventListener("change", () => { state.gender = genderSel.value; render(geojson, allRows, state); });
+    affTypeSel.addEventListener("change", () => { state.affiliation_type = affTypeSel.value; render(geojson, allRows, state); });
+
+    yearMinEl.addEventListener("input", () => { syncYear(); render(geojson, allRows, state); });
+    yearMaxEl.addEventListener("input", () => { syncYear(); render(geojson, allRows, state); });
+
+    document.getElementById("reset").addEventListener("click", () => {
+      categorySel.value = "__ALL__";
+      genderSel.value = "__ALL__";
+      affTypeSel.value = "__ALL__";
+      yearMinEl.value = yMin;
+      yearMaxEl.value = yMax;
+      state.category = "__ALL__";
+      state.gender = "__ALL__";
+      state.affiliation_type = "__ALL__";
+      state.yearMin = yMin;
+      state.yearMax = yMax;
+      render(geojson, allRows, state);
+    });
+  })().catch(err => {
+    console.error(err);
+    document.body.innerHTML = `<pre style="padding:16px;">Error: ${err.message}</pre>`;
+  });
+</script>
+</body>
+</html>

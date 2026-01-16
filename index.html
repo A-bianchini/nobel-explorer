@@ -3,20 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nobel distribution — Top countries</title>
+  <title>Nobel winners — year view</title>
 
+  <!-- Plotly -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <!-- CSV parser -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
     :root { --bg:#fff; --fg:#111; --muted:#666; --border:#e6e6e6; --card:#fafafa; }
     body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:var(--fg); }
-    .wrap { max-width:1100px; margin:0 auto; padding:28px 16px 40px; }
+    .wrap { max-width:1100px; margin:0 auto; padding:28px 16px 44px; }
     h1 { margin:0 0 6px 0; font-size:22px; font-weight:700; }
-    .sub { margin:0 0 18px 0; color:var(--muted); font-size:13px; line-height:1.4; }
+    .sub { margin:0 0 18px 0; color:var(--muted); font-size:13px; line-height:1.45; }
 
     .panel {
-      display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;
+      display:grid; grid-template-columns: 1fr 1fr; gap:12px;
       padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--card);
       margin-bottom:14px;
     }
@@ -24,179 +26,250 @@
     select, input[type="range"] { width:100%; }
     select { padding:8px 10px; border-radius:10px; border:1px solid var(--border); background:white; font-size:13px; }
     .rangeRow { display:flex; align-items:center; gap:10px; }
-    .pill { font-size:12px; border:1px solid var(--border); background:white; padding:6px 10px; border-radius:999px; min-width:64px; text-align:center; }
+    .pill { font-size:12px; border:1px solid var(--border); background:white; padding:6px 10px; border-radius:999px; min-width:72px; text-align:center; }
 
-    #chart { border:1px solid var(--border); border-radius:12px; overflow:hidden; }
-    .foot { margin-top:10px; font-size:12px; color:var(--muted); }
+    .sectionTitle { margin:18px 0 10px 0; font-size:14px; font-weight:700; }
+    .cards { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .card { border:1px solid var(--border); border-radius:12px; padding:12px; background:white; }
+    .kicker { font-size:12px; color:var(--muted); margin-bottom:6px; }
+    .name { font-weight:700; font-size:14px; margin-bottom:6px; }
+    .mot { font-size:12.5px; line-height:1.4; color:#222; }
 
-    @media (max-width: 900px) { .panel { grid-template-columns: 1fr; } }
+    .catBlock { margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
+    .catHeader { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .catHeader .cat { font-weight:800; font-size:13px; }
+    .catHeader .meta { color:var(--muted); font-size:12px; }
+
+    #chartBox { margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:white; }
+    #status { margin-top:10px; font-size:12px; color:var(--muted); }
+
+    @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } }
+    @media (max-width: 620px) { .panel { grid-template-columns: 1fr; } }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <h1>Nobel distribution</h1>
+    <h1>Nobel winners (by year)</h1>
     <p class="sub">
-      Bar chart orizzontale — <b>Countries by Nobel count</b> per anno.
-      Puoi sommare <b>tutte le categorie</b> oppure selezionarne una, e filtrare per gender e affiliation.
+      Seleziona un anno: sotto vedi i vincitori con <b>categoria</b> e <b>motivazione</b>.
+      In basso: scegli una categoria e vedi la composizione dei vincitori (female/male) + <b>team size</b>.
     </p>
 
     <div class="panel">
       <div class="field">
-        <label for="categorySel">Category</label>
-        <select id="categorySel"></select>
-      </div>
-
-      <div class="field">
-        <label for="genderSel">Gender</label>
-        <select id="genderSel"></select>
-      </div>
-
-      <div class="field">
-        <label for="affSel">Affiliation</label>
-        <select id="affSel"></select>
-      </div>
-
-      <div class="field" style="grid-column: 1 / -1;">
         <label for="yearSlider">Year</label>
         <div class="rangeRow">
           <input id="yearSlider" type="range" />
           <span class="pill" id="yearVal"></span>
         </div>
       </div>
+
+      <div class="field">
+        <label for="categoryToggle">Category (for composition chart)</label>
+        <select id="categoryToggle"></select>
+      </div>
     </div>
 
-    <div id="chart"></div>
-    <div class="foot" id="status">Loading…</div>
+    <div class="sectionTitle" id="winnersTitle">Winners</div>
+    <div id="winners"></div>
+
+    <div class="sectionTitle">Composition (selected category)</div>
+    <div id="chartBox">
+      <div id="chart"></div>
+    </div>
+
+    <div id="status">Loading…</div>
   </div>
 
 <script>
   // =========================
-  // CONFIG
+  // CONFIG (tuoi file)
   // =========================
-  const AGG_CSV_URL = "data/nobel_country_agg.csv";
+  const TIDY_CSV_URL = "data/nobel_affiliations_tidy.csv";
   const META_JSON_URL = "data/nobel_filters_meta.json";
 
-  const AFF_UI = [
-    { value: "All", label: "All" },
-    { value: "university", label: "University" },
-    { value: "research_institute", label: "Research institute" },
-    { value: "organization", label: "Organization" }, // company + government + other
-  ];
-
-  let DATA = [];
+  let DATA = [];   // righe tidy (una riga ~ una laureate-affiliation; noi dedupiamo per laureate+year+category+motivation)
   let META = null;
 
   const els = {
-    categorySel: document.getElementById("categorySel"),
-    genderSel: document.getElementById("genderSel"),
-    affSel: document.getElementById("affSel"),
     yearSlider: document.getElementById("yearSlider"),
     yearVal: document.getElementById("yearVal"),
+    categoryToggle: document.getElementById("categoryToggle"),
+    winners: document.getElementById("winners"),
+    winnersTitle: document.getElementById("winnersTitle"),
     status: document.getElementById("status"),
   };
 
-  function setOptions(selectEl, options) {
+  function setOptions(selectEl, values) {
     selectEl.innerHTML = "";
-    options.forEach(opt => {
+    values.forEach(v => {
       const o = document.createElement("option");
-      o.value = opt.value;
-      o.textContent = opt.label;
+      o.value = v;
+      o.textContent = v;
       selectEl.appendChild(o);
     });
   }
 
-  function getFilters() {
-    return {
-      category: els.categorySel.value,
-      gender: els.genderSel.value,
-      affiliation: els.affSel.value,
-      year: Number(els.yearSlider.value),
-    };
+  function getYear() {
+    return Number(els.yearSlider.value);
   }
 
-  function mapAffiliationToUI(a) {
-    if (a === "university") return "university";
-    if (a === "research_institute") return "research_institute";
-    return "organization";
+  function getSelectedCategory() {
+    return els.categoryToggle.value;
   }
 
-  function applyFilters(rows, f) {
-    return rows.filter(r => {
-      if (r.year !== f.year) return false;
-      if (f.category !== "All" && r.category !== f.category) return false;
-      if (f.gender !== "All" && r.gender !== f.gender) return false;
-      if (f.affiliation !== "All" && r.aff_ui !== f.affiliation) return false;
-      return true;
-    });
+  // Dedup: nel tidy puoi avere più righe per lo stesso laureato (multiple affiliations).
+  // Per lista "winners" ci serve 1 riga per (laureate_id, award_year, category, motivation_en).
+  function dedupLaureates(rows) {
+    const seen = new Set();
+    const out = [];
+    for (const r of rows) {
+      const key = [
+        r.laureate_id,
+        r.award_year,
+        r.category,
+        r.motivation_en
+      ].join("||");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(r);
+    }
+    return out;
   }
 
-  function sumByCountry(rows) {
+  function groupByCategory(rows) {
     const m = new Map();
     for (const r of rows) {
-      const k = r.country || "unknown";
-      m.set(k, (m.get(k) || 0) + r.count);
+      const c = r.category || "unknown";
+      if (!m.has(c)) m.set(c, []);
+      m.get(c).push(r);
     }
-    return [...m.entries()]
-      .map(([country, count]) => ({ country, count }))
-      .sort((a,b) => b.count - a.count || a.country.localeCompare(b.country));
+    // ordina categorie alfabeticamente (o come in meta)
+    return m;
   }
 
-  function renderChart(data, f) {
-    const y = data.map(d => d.country).reverse();
-    const x = data.map(d => d.count).reverse();
+  function escapeHtml(s) {
+    return (s ?? "").toString()
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-    const titleBits = [
-      `Nobel count by country — ${f.year}`,
-      (f.category === "All" ? "All categories" : `Category: ${f.category}`),
-      (f.gender === "All" ? "All genders" : `Gender: ${f.gender}`),
-      (() => {
-        if (f.affiliation === "All") return "All affiliations";
-        if (f.affiliation === "university") return "University";
-        if (f.affiliation === "research_institute") return "Research institute";
-        return "Organization";
-      })()
-    ];
+  function renderWinners(year) {
+    const rowsYear = DATA.filter(r => r.award_year === year);
+    const winners = dedupLaureates(rowsYear);
+
+    // titolo
+    els.winnersTitle.textContent = `Winners — ${year}`;
+
+    // grouping
+    const byCat = groupByCategory(winners);
+
+    // per ordine: usa meta.categories se c'è
+    const catOrder = (META?.categories ?? Array.from(byCat.keys())).slice();
+
+    let html = "";
+    for (const cat of catOrder) {
+      const list = byCat.get(cat) || [];
+      if (list.length === 0) continue;
+
+      const teamSize = list.length;
+      const fCount = list.filter(x => x.gender === "female").length;
+      const mCount = list.filter(x => x.gender === "male").length;
+
+      html += `
+        <div class="catBlock">
+          <div class="catHeader">
+            <div class="cat">${escapeHtml(cat)}</div>
+            <div class="meta">Team size: ${teamSize} • Female: ${fCount} • Male: ${mCount}</div>
+          </div>
+          <div class="cards">
+            ${list.map(r => `
+              <div class="card">
+                <div class="kicker">${escapeHtml(r.gender)} • ${escapeHtml(r.affiliation_type ?? "unknown")}</div>
+                <div class="name">${escapeHtml(r.laureate_name)}</div>
+                <div class="mot">${escapeHtml(r.motivation_en)}</div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    if (!html) {
+      html = `<div class="card">No winners found for this year.</div>`;
+    }
+    els.winners.innerHTML = html;
+
+    return winners; // utile per chart
+  }
+
+  function renderCompositionChart(year, category) {
+    const rowsYear = DATA.filter(r => r.award_year === year && r.category === category);
+    const winners = dedupLaureates(rowsYear);
+
+    const female = winners.filter(x => x.gender === "female").length;
+    const male = winners.filter(x => x.gender === "male").length;
+    const teamSize = winners.length;
+
+    const x = ["Female", "Male", "Team size"];
+    const y = [female, male, teamSize];
 
     const trace = {
       type: "bar",
-      orientation: "h",
-      y, x,
-      hovertemplate: "<b>%{y}</b><br>Nobel prizes: %{x}<extra></extra>",
+      x, y,
+      hovertemplate: "<b>%{x}</b><br>Count: %{y}<extra></extra>",
     };
 
     const layout = {
-      title: { text: titleBits.join(" • "), x: 0.02, xanchor: "left", font: { size: 14 } },
-      margin: { l: 170, r: 20, t: 70, b: 50 },
-      xaxis: {
-        title: "Number of Nobel prizes",
+      title: { text: `Composition — ${category} (${year})`, x: 0.02, xanchor: "left", font: { size: 14 } },
+      margin: { l: 60, r: 20, t: 60, b: 55 },
+      yaxis: {
+        title: "Count",
         rangemode: "tozero",
         tickmode: "linear",
         tick0: 0,
         dtick: 1,
         gridcolor: "#f0f0f0",
-        zerolinecolor: "#e6e6e6"
+        zerolinecolor: "#e6e6e6",
       },
-      yaxis: { title: "" },
+      xaxis: { title: "" },
       paper_bgcolor: "#ffffff",
       plot_bgcolor: "#ffffff",
-      height: Math.max(520, 26 * y.length + 150),
+      height: 420,
     };
 
     Plotly.react("chart", [trace], layout, { displayModeBar: false, responsive: true });
+
+    return { teamSize, female, male };
   }
 
   function update() {
-    const f = getFilters();
-    els.yearVal.textContent = f.year;
+    const year = getYear();
+    els.yearVal.textContent = year;
 
-    const filtered = applyFilters(DATA, f);
-    const summed = sumByCountry(filtered);
+    const winners = renderWinners(year);
+
+    // se la categoria selezionata non ha dati in quell'anno, prova a switchare alla prima con dati
+    const cats = (META?.categories ?? []).slice();
+    const hasData = (cat) => winners.some(w => w.category === cat);
+
+    let cat = getSelectedCategory();
+    if (!hasData(cat)) {
+      const first = cats.find(hasData) || cat;
+      els.categoryToggle.value = first;
+      cat = first;
+    }
+
+    const comp = renderCompositionChart(year, cat);
 
     els.status.textContent =
-      `Countries shown: ${summed.length.toLocaleString()} • Organization = company + government + other`;
-
-    renderChart(summed, f);
+      `Year rows (tidy): ${DATA.filter(r => r.award_year === year).length.toLocaleString()} • ` +
+      `Winners (dedup): ${winners.length.toLocaleString()} • ` +
+      `Selected category team size: ${comp.teamSize}`;
   }
 
   async function loadMeta() {
@@ -205,9 +278,9 @@
     return await res.json();
   }
 
-  async function loadAggCsv() {
+  async function loadTidyCsv() {
     return new Promise((resolve, reject) => {
-      Papa.parse(AGG_CSV_URL, {
+      Papa.parse(TIDY_CSV_URL, {
         download: true,
         header: true,
         dynamicTyping: true,
@@ -222,20 +295,7 @@
     try {
       META = await loadMeta();
 
-      // Category
-      const catOpts = [{ value: "All", label: "All categories" }]
-        .concat((META.categories ?? []).map(c => ({ value: c, label: c })));
-      setOptions(els.categorySel, catOpts);
-
-      // Gender
-      const genOpts = [{ value: "All", label: "All" }]
-        .concat((META.genders ?? []).map(g => ({ value: g, label: g })));
-      setOptions(els.genderSel, genOpts);
-
-      // Affiliation (3 gruppi)
-      setOptions(els.affSel, AFF_UI);
-
-      // Year slider
+      // slider anni
       const yMin = META.year_min ?? 1901;
       const yMax = META.year_max ?? 2025;
       els.yearSlider.min = String(yMin);
@@ -244,20 +304,28 @@
       els.yearSlider.value = String(yMax);
       els.yearVal.textContent = String(yMax);
 
-      // Data
-      const raw = await loadAggCsv();
+      // categorie per toggle
+      const cats = META.categories ?? [];
+      setOptions(els.categoryToggle, cats);
+      if (cats.length) els.categoryToggle.value = cats[cats.length - 1] ?? cats[0];
+
+      // carica tidy
+      const raw = await loadTidyCsv();
+
+      // normalizza colonne che usiamo
       DATA = raw.map(r => ({
-        country: (r.country ?? "unknown").toString(),
-        category: (r.category ?? "unknown").toString(),
+        laureate_id: Number(r.laureate_id),
+        laureate_name: (r.laureate_name ?? "").toString(),
         gender: (r.gender ?? "unknown").toString(),
-        year: Number(r.year),
-        aff_ui: mapAffiliationToUI(r.affiliation_type),
-        count: Number(r.count) || 0,
-      })).filter(r => Number.isFinite(r.year) && r.count > 0);
+        award_year: Number(r.award_year),
+        category: (r.category ?? "unknown").toString(),
+        motivation_en: (r.motivation_en ?? "").toString(),
+        affiliation_type: (r.affiliation_type ?? "unknown").toString(),
+      })).filter(r => Number.isFinite(r.award_year) && r.laureate_name);
 
       // listeners
-      [els.categorySel, els.genderSel, els.affSel].forEach(el => el.addEventListener("change", update));
       els.yearSlider.addEventListener("input", update);
+      els.categoryToggle.addEventListener("change", update);
 
       update();
     } catch (e) {
@@ -270,4 +338,3 @@
 </script>
 </body>
 </html>
-

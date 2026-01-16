@@ -46,7 +46,7 @@
   <div class="wrap">
     <h1>Nobel winners</h1>
     <p class="sub">
-      Seleziona <b>anno</b> e <b>categoria</b>: mostro i winners (nome + motivazione) e la composizione del team (female/male).
+      Seleziona <b>anno</b> e <b>categoria</b>
     </p>
 
     <div class="panel">
@@ -166,7 +166,7 @@
   }
 
   function renderCompositionChart(year, category, stats) {
-    const x = ["Team"];
+    const x = [" "];
 
     const traceFemale = {
       type: "bar",
@@ -200,7 +200,6 @@
     }
 
     const layout = {
-      title: { text: `Composition — ${category} (${year})`, x: 0.02, xanchor: "left", font: { size: 14 } },
       barmode: "stack",
       margin: { l: 60, r: 20, t: 60, b: 55 },
       yaxis: {

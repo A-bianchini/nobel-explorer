@@ -175,6 +175,7 @@
       x,
       y: [stats.female],
       name: "Female",
+      marker: { color: "#fbb4ae" }
       hovertemplate: "<b>Female</b><br>Count: %{y}<extra></extra>",
     };
 
@@ -183,6 +184,7 @@
       x,
       y: [stats.male],
       name: "Male",
+      marker: { color: "#b3cde3" }
       hovertemplate: "<b>Male</b><br>Count: %{y}<extra></extra>",
     };
 
@@ -194,16 +196,17 @@
         x,
         y: [stats.unknown],
         name: "Unknown",
+        marker: { color: ""#bdbdbd"" }
         hovertemplate: "<b>Unknown</b><br>Count: %{y}<extra></extra>",
       });
     }
 
     const layout = {
-      title: { text: `Composition — ${category} (${year}) • Team size: ${stats.teamSize}`, x: 0.02, xanchor: "left", font: { size: 14 } },
+      title: { text: `Composition — ${category} (${year})`, x: 0.02, xanchor: "left", font: { size: 14 } },
       barmode: "stack",
       margin: { l: 60, r: 20, t: 60, b: 55 },
       yaxis: {
-        title: "Count",
+        title: " ",
         rangemode: "tozero",
         tickmode: "linear",
         tick0: 0,
@@ -233,10 +236,6 @@
 
     renderWinnersList(winners);
     renderCompositionChart(year, category, stats);
-
-    // status minimal (se vuoi lo tolgo del tutto)
-    els.status.textContent = `Winners: ${stats.teamSize} • Female: ${stats.female} • Male: ${stats.male}`;
-  }
 
   async function loadMeta() {
     const res = await fetch(META_JSON_URL);

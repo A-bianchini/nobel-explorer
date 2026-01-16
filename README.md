@@ -9,6 +9,5 @@ nobel-winners/<br>
 ├─ README.md<br>
 └─ data/<br>
 &nbsp;&nbsp;├─ nobel_affiliations_tidy.csv<br>
-&nbsp;&nbsp;├─ nobel_affiliations_tidy.json<br>
 &nbsp;&nbsp;└─ nobel_filters_meta.json<br>
 </small>

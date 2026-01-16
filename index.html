@@ -27,19 +27,6 @@
     .pill { font-size:12px; border:1px solid var(--border); background:white; padding:6px 10px; border-radius:999px; min-width:72px; text-align:center; }
 
     .sectionTitle { margin:18px 0 10px 0; font-size:14px; font-weight:700; }
-    .summary {
-      border:1px solid var(--border);
-      border-radius:12px;
-      background:white;
-      padding:12px;
-      margin-bottom:10px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-    .summary .item { font-size:12px; color:var(--muted); }
-    .summary .item b { color:var(--fg); }
 
     .cards { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
     .card { border:1px solid var(--border); border-radius:12px; padding:12px; background:white; }
@@ -59,7 +46,7 @@
   <div class="wrap">
     <h1>Nobel winners</h1>
     <p class="sub">
-      Seleziona <b>anno</b> e <b>categoria</b>: mostro i winners (nome + motivazione) e la composizione del team (female/male + team size).
+      Seleziona <b>anno</b> e <b>categoria</b>: mostro i winners (nome + motivazione) e la composizione del team (female/male).
     </p>
 
     <div class="panel">
@@ -78,13 +65,12 @@
     </div>
 
     <div class="sectionTitle" id="title">Winners</div>
-    <div id="summary"></div>
     <div id="winners"></div>
 
     <div class="sectionTitle">Team composition</div>
     <div id="chartBox"><div id="chart"></div></div>
 
-    <div id="status">Loading…</div>
+    <div id="status"></div>
   </div>
 
 <script>
@@ -99,7 +85,6 @@
     yearVal: document.getElementById("yearVal"),
     categoryToggle: document.getElementById("categoryToggle"),
     title: document.getElementById("title"),
-    summary: document.getElementById("summary"),
     winners: document.getElementById("winners"),
     status: document.getElementById("status"),
   };
@@ -126,7 +111,7 @@
       .replaceAll("'", "&#039;");
   }
 
-  // Dedup: multiple affiliations per laureate
+  // Dedup: multiple affiliations per laureate -> 1 record per laureate/year/category/motivation
   function dedupLaureates(rows) {
     const seen = new Set();
     const out = [];
@@ -147,20 +132,19 @@
   function computeStats(winners) {
     const female = winners.filter(x => x.gender === "female").length;
     const male = winners.filter(x => x.gender === "male").length;
-    // puoi aggiungere unknown se vuoi visualizzarlo
-    const unknown = winners.filter(x => x.gender !== "female" && x.gender !== "male").length;
+    const unknown = winners.length - female - male;
     const teamSize = winners.length;
     return { female, male, unknown, teamSize };
   }
 
-  function renderSummary(stats) {
-    els.summary.innerHTML = `
-      <div class="summary">
-        <div class="item">Team size: <b>${stats.teamSize}</b></div>
-        <div class="item">Female: <b>${stats.female}</b></div>
-        <div class="item">Male: <b>${stats.male}</b></div>
-      </div>
-    `;
+  function formatAffiliation(r) {
+    const name = (r.affiliation_name ?? "").trim();
+    const country = (r.affiliation_country ?? "").trim();
+
+    if (name && country) return `${name} — ${country}`;
+    if (name) return name;
+    if (country) return country;
+    return "Affiliation: unknown";
   }
 
   function renderWinnersList(winners) {
@@ -173,7 +157,7 @@
       <div class="cards">
         ${winners.map(r => `
           <div class="card">
-            <div class="kicker">${escapeHtml(r.gender)}</div>
+            <div class="kicker">${escapeHtml(formatAffiliation(r))}</div>
             <div class="name">${escapeHtml(r.laureate_name)}</div>
             <div class="mot">${escapeHtml(r.motivation_en)}</div>
           </div>
@@ -182,19 +166,41 @@
     `;
   }
 
+  // Stacked bar: un'unica barra "Team" segmentata Female/Male (+ eventualmente Unknown)
   function renderCompositionChart(year, category, stats) {
-    // Nota: bar chart semplice, y solo interi
-    const x = ["Female", "Male", "Team size"];
-    const y = [stats.female, stats.male, stats.teamSize];
+    const x = ["Team"];
 
-    const trace = {
+    const traceFemale = {
       type: "bar",
-      x, y,
-      hovertemplate: "<b>%{x}</b><br>Count: %{y}<extra></extra>",
+      x,
+      y: [stats.female],
+      name: "Female",
+      hovertemplate: "<b>Female</b><br>Count: %{y}<extra></extra>",
     };
 
+    const traceMale = {
+      type: "bar",
+      x,
+      y: [stats.male],
+      name: "Male",
+      hovertemplate: "<b>Male</b><br>Count: %{y}<extra></extra>",
+    };
+
+    // Se vuoi includere Unknown nel team (io lo lascio solo se esiste)
+    const traces = [traceFemale, traceMale];
+    if (stats.unknown > 0) {
+      traces.push({
+        type: "bar",
+        x,
+        y: [stats.unknown],
+        name: "Unknown",
+        hovertemplate: "<b>Unknown</b><br>Count: %{y}<extra></extra>",
+      });
+    }
+
     const layout = {
-      title: { text: `Composition — ${category} (${year})`, x: 0.02, xanchor: "left", font: { size: 14 } },
+      title: { text: `Composition — ${category} (${year}) • Team size: ${stats.teamSize}`, x: 0.02, xanchor: "left", font: { size: 14 } },
+      barmode: "stack",
       margin: { l: 60, r: 20, t: 60, b: 55 },
       yaxis: {
         title: "Count",
@@ -209,9 +215,10 @@
       paper_bgcolor: "#ffffff",
       plot_bgcolor: "#ffffff",
       height: 420,
+      legend: { orientation: "h", x: 0.02, y: -0.15 }
     };
 
-    Plotly.react("chart", [trace], layout, { displayModeBar: false, responsive: true });
+    Plotly.react("chart", traces, layout, { displayModeBar: false, responsive: true });
   }
 
   function update() {
@@ -224,13 +231,11 @@
     const winners = getWinners(year, category);
     const stats = computeStats(winners);
 
-    renderSummary(stats);
     renderWinnersList(winners);
     renderCompositionChart(year, category, stats);
 
-    els.status.textContent =
-      `Winners (dedup): ${stats.teamSize.toLocaleString()} • ` +
-      `Female: ${stats.female} • Male: ${stats.male}`;
+    // status minimal (se vuoi lo tolgo del tutto)
+    els.status.textContent = `Winners: ${stats.teamSize} • Female: ${stats.female} • Male: ${stats.male}`;
   }
 
   async function loadMeta() {
@@ -256,7 +261,7 @@
     try {
       META = await loadMeta();
 
-      // slider anni
+      // Year slider
       const yMin = META.year_min ?? 1901;
       const yMax = META.year_max ?? 2025;
       els.yearSlider.min = String(yMin);
@@ -265,12 +270,12 @@
       els.yearSlider.value = String(yMax);
       els.yearVal.textContent = String(yMax);
 
-      // categorie
+      // Category toggle
       const cats = META.categories ?? [];
       setOptions(els.categoryToggle, cats);
       if (cats.length) els.categoryToggle.value = cats[0];
 
-      // dati tidy
+      // Data
       const raw = await loadTidyCsv();
       DATA = raw.map(r => ({
         laureate_id: Number(r.laureate_id),
@@ -279,6 +284,8 @@
         award_year: Number(r.award_year),
         category: (r.category ?? "unknown").toString(),
         motivation_en: (r.motivation_en ?? "").toString(),
+        affiliation_name: (r.affiliation_name ?? "").toString(),
+        affiliation_country: (r.affiliation_country ?? "").toString(),
       })).filter(r => Number.isFinite(r.award_year) && r.laureate_name);
 
       els.yearSlider.addEventListener("input", update);

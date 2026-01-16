@@ -29,16 +29,14 @@
     .pill { font-size:12px; border:1px solid var(--border); background:white; padding:6px 10px; border-radius:999px; min-width:72px; text-align:center; }
 
     .sectionTitle { margin:18px 0 10px 0; font-size:14px; font-weight:700; }
+    .cardRow { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; }
+    .meta { color:var(--muted); font-size:12px; }
+
     .cards { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
     .card { border:1px solid var(--border); border-radius:12px; padding:12px; background:white; }
     .kicker { font-size:12px; color:var(--muted); margin-bottom:6px; }
     .name { font-weight:700; font-size:14px; margin-bottom:6px; }
     .mot { font-size:12.5px; line-height:1.4; color:#222; }
-
-    .catBlock { margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
-    .catHeader { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; }
-    .catHeader .cat { font-weight:800; font-size:13px; }
-    .catHeader .meta { color:var(--muted); font-size:12px; }
 
     #chartBox { margin-top:14px; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:white; }
     #status { margin-top:10px; font-size:12px; color:var(--muted); }
@@ -52,8 +50,8 @@
   <div class="wrap">
     <h1>Nobel winners (by year)</h1>
     <p class="sub">
-      Seleziona un anno: sotto vedi i vincitori con <b>categoria</b> e <b>motivazione</b>.
-      In basso: scegli una categoria e vedi la composizione dei vincitori (female/male) + <b>team size</b>.
+      Seleziona un anno e una categoria: mostro i vincitori (nome + motivazione).
+      Sotto: bar chart di composizione (female/male + team size) sugli stessi vincitori.
     </p>
 
     <div class="panel">
@@ -66,7 +64,7 @@
       </div>
 
       <div class="field">
-        <label for="categoryToggle">Category (for composition chart)</label>
+        <label for="categoryToggle">Category</label>
         <select id="categoryToggle"></select>
       </div>
     </div>
@@ -74,7 +72,7 @@
     <div class="sectionTitle" id="winnersTitle">Winners</div>
     <div id="winners"></div>
 
-    <div class="sectionTitle">Composition (selected category)</div>
+    <div class="sectionTitle" id="compTitle">Composition</div>
     <div id="chartBox">
       <div id="chart"></div>
     </div>
@@ -84,12 +82,12 @@
 
 <script>
   // =========================
-  // CONFIG (tuoi file)
+  // CONFIG
   // =========================
   const TIDY_CSV_URL = "data/nobel_affiliations_tidy.csv";
   const META_JSON_URL = "data/nobel_filters_meta.json";
 
-  let DATA = [];   // righe tidy (una riga ~ una laureate-affiliation; noi dedupiamo per laureate+year+category+motivation)
+  let DATA = [];
   let META = null;
 
   const els = {
@@ -98,6 +96,7 @@
     categoryToggle: document.getElementById("categoryToggle"),
     winners: document.getElementById("winners"),
     winnersTitle: document.getElementById("winnersTitle"),
+    compTitle: document.getElementById("compTitle"),
     status: document.getElementById("status"),
   };
 
@@ -111,43 +110,8 @@
     });
   }
 
-  function getYear() {
-    return Number(els.yearSlider.value);
-  }
-
-  function getSelectedCategory() {
-    return els.categoryToggle.value;
-  }
-
-  // Dedup: nel tidy puoi avere più righe per lo stesso laureato (multiple affiliations).
-  // Per lista "winners" ci serve 1 riga per (laureate_id, award_year, category, motivation_en).
-  function dedupLaureates(rows) {
-    const seen = new Set();
-    const out = [];
-    for (const r of rows) {
-      const key = [
-        r.laureate_id,
-        r.award_year,
-        r.category,
-        r.motivation_en
-      ].join("||");
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(r);
-    }
-    return out;
-  }
-
-  function groupByCategory(rows) {
-    const m = new Map();
-    for (const r of rows) {
-      const c = r.category || "unknown";
-      if (!m.has(c)) m.set(c, []);
-      m.get(c).push(r);
-    }
-    // ordina categorie alfabeticamente (o come in meta)
-    return m;
-  }
+  function getYear() { return Number(els.yearSlider.value); }
+  function getCategory() { return els.categoryToggle.value; }
 
   function escapeHtml(s) {
     return (s ?? "").toString()
@@ -158,65 +122,66 @@
       .replaceAll("'", "&#039;");
   }
 
-  function renderWinners(year) {
-    const rowsYear = DATA.filter(r => r.award_year === year);
-    const winners = dedupLaureates(rowsYear);
-
-    // titolo
-    els.winnersTitle.textContent = `Winners — ${year}`;
-
-    // grouping
-    const byCat = groupByCategory(winners);
-
-    // per ordine: usa meta.categories se c'è
-    const catOrder = (META?.categories ?? Array.from(byCat.keys())).slice();
-
-    let html = "";
-    for (const cat of catOrder) {
-      const list = byCat.get(cat) || [];
-      if (list.length === 0) continue;
-
-      const teamSize = list.length;
-      const fCount = list.filter(x => x.gender === "female").length;
-      const mCount = list.filter(x => x.gender === "male").length;
-
-      html += `
-        <div class="catBlock">
-          <div class="catHeader">
-            <div class="cat">${escapeHtml(cat)}</div>
-            <div class="meta">Team size: ${teamSize} • Female: ${fCount} • Male: ${mCount}</div>
-          </div>
-          <div class="cards">
-            ${list.map(r => `
-              <div class="card">
-                <div class="kicker">${escapeHtml(r.gender)} • ${escapeHtml(r.affiliation_type ?? "unknown")}</div>
-                <div class="name">${escapeHtml(r.laureate_name)}</div>
-                <div class="mot">${escapeHtml(r.motivation_en)}</div>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      `;
+  // Dedup (multiple affiliations per laureate)
+  function dedupLaureates(rows) {
+    const seen = new Set();
+    const out = [];
+    for (const r of rows) {
+      const key = [r.laureate_id, r.award_year, r.category, r.motivation_en].join("||");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(r);
     }
-
-    if (!html) {
-      html = `<div class="card">No winners found for this year.</div>`;
-    }
-    els.winners.innerHTML = html;
-
-    return winners; // utile per chart
+    return out;
   }
 
-  function renderCompositionChart(year, category) {
-    const rowsYear = DATA.filter(r => r.award_year === year && r.category === category);
-    const winners = dedupLaureates(rowsYear);
+  function getWinners(year, category) {
+    const subset = DATA.filter(r => r.award_year === year && r.category === category);
+    return dedupLaureates(subset);
+  }
+
+  function renderWinners(year, category) {
+    const winners = getWinners(year, category);
+
+    els.winnersTitle.textContent = `Winners — ${category} (${year})`;
+
+    if (winners.length === 0) {
+      els.winners.innerHTML = `<div class="card">No winners found for this selection.</div>`;
+      return { winners, female: 0, male: 0, teamSize: 0 };
+    }
 
     const female = winners.filter(x => x.gender === "female").length;
     const male = winners.filter(x => x.gender === "male").length;
     const teamSize = winners.length;
 
+    const header = `
+      <div class="cardRow">
+        <div class="meta">Team size: <b>${teamSize}</b></div>
+        <div class="meta">Female: <b>${female}</b> • Male: <b>${male}</b></div>
+      </div>
+    `;
+
+    const cards = `
+      <div class="cards">
+        ${winners.map(r => `
+          <div class="card">
+            <div class="kicker">${escapeHtml(r.gender)} • ${escapeHtml(r.affiliation_type ?? "unknown")}</div>
+            <div class="name">${escapeHtml(r.laureate_name)}</div>
+            <div class="mot">${escapeHtml(r.motivation_en)}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    els.winners.innerHTML = header + cards;
+    return { winners, female, male, teamSize };
+  }
+
+  function renderCompositionChart(year, category, stats) {
+    els.compTitle.textContent = `Composition — ${category} (${year})`;
+
     const x = ["Female", "Male", "Team size"];
-    const y = [female, male, teamSize];
+    const y = [stats.female, stats.male, stats.teamSize];
 
     const trace = {
       type: "bar",
@@ -243,33 +208,19 @@
     };
 
     Plotly.react("chart", [trace], layout, { displayModeBar: false, responsive: true });
-
-    return { teamSize, female, male };
   }
 
   function update() {
     const year = getYear();
+    const category = getCategory();
     els.yearVal.textContent = year;
 
-    const winners = renderWinners(year);
-
-    // se la categoria selezionata non ha dati in quell'anno, prova a switchare alla prima con dati
-    const cats = (META?.categories ?? []).slice();
-    const hasData = (cat) => winners.some(w => w.category === cat);
-
-    let cat = getSelectedCategory();
-    if (!hasData(cat)) {
-      const first = cats.find(hasData) || cat;
-      els.categoryToggle.value = first;
-      cat = first;
-    }
-
-    const comp = renderCompositionChart(year, cat);
+    const stats = renderWinners(year, category);
+    renderCompositionChart(year, category, stats);
 
     els.status.textContent =
-      `Year rows (tidy): ${DATA.filter(r => r.award_year === year).length.toLocaleString()} • ` +
-      `Winners (dedup): ${winners.length.toLocaleString()} • ` +
-      `Selected category team size: ${comp.teamSize}`;
+      `Tidy rows (year): ${DATA.filter(r => r.award_year === year).length.toLocaleString()} • ` +
+      `Winners (dedup, selection): ${stats.teamSize.toLocaleString()}`;
   }
 
   async function loadMeta() {
@@ -295,7 +246,7 @@
     try {
       META = await loadMeta();
 
-      // slider anni
+      // Year slider
       const yMin = META.year_min ?? 1901;
       const yMax = META.year_max ?? 2025;
       els.yearSlider.min = String(yMin);
@@ -304,15 +255,13 @@
       els.yearSlider.value = String(yMax);
       els.yearVal.textContent = String(yMax);
 
-      // categorie per toggle
+      // Category toggle
       const cats = META.categories ?? [];
       setOptions(els.categoryToggle, cats);
       if (cats.length) els.categoryToggle.value = cats[cats.length - 1] ?? cats[0];
 
-      // carica tidy
+      // Load tidy
       const raw = await loadTidyCsv();
-
-      // normalizza colonne che usiamo
       DATA = raw.map(r => ({
         laureate_id: Number(r.laureate_id),
         laureate_name: (r.laureate_name ?? "").toString(),
@@ -338,3 +287,4 @@
 </script>
 </body>
 </html>
+
